@@ -18,7 +18,7 @@ export function AboutApp(_props: AppProps) {
         <Ionicons name="logo-windows" size={44} color={palette.accent} />
         <Text style={[styles.title, { color: palette.text }]}>Windows in Mobile</Text>
         <Text style={[styles.subtitle, { color: palette.textMuted }]}>
-          Version 2.0.0 — Built with React Native and Expo
+          Version 2.0.1 — Built with React Native and Expo
         </Text>
       </View>
 

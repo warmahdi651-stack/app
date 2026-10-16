@@ -223,7 +223,7 @@ export function TerminalApp({ windowId }: AppProps) {
         push(settings.userName || 'user');
         break;
       case 'ver':
-        push(`Windows ${settings.shellVersion?.replace('win', '') ?? '11'} [Simulator 2.0.0]`);
+        push(`Windows ${settings.shellVersion?.replace('win', '') ?? '11'} [Simulator 2.0.1]`);
         break;
       case 'date':
         push(new Date().toLocaleDateString('en-US'));
@@ -243,7 +243,7 @@ export function TerminalApp({ windowId }: AppProps) {
         push('');
         push(`  User: ${settings.userName || 'user'}`);
         push(`  OS: Windows ${settings.shellVersion?.replace('win', '') ?? '11'} (simulated)`);
-        push(`  Shell: Version 2.0.0 — React Native`);
+        push(`  Shell: Version 2.0.1 — React Native`);
         push(`  Date: ${new Date().toLocaleDateString('en-US')}`);
         break;
       }

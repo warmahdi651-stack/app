@@ -159,9 +159,9 @@ EXPO_PUBLIC_API_URL=http://192.168.1.20:4000 npm --prefix apps/mobile run start
 
 | لینک | توضیح |
 |---|---|
-| `https://warmahdi651-stack.github.io/app/Windows-in-Mobile-v2.0.0.apk` | Windows in Mobile v2.0.0 — GitHub Pages |
-| `https://github.com/warmahdi651-stack/app/raw/arena/3fb7149b-app/releases/Windows-in-Mobile-v2.0.0.apk` | GitHub raw (session branch) |
-| `https://cdn.jsdelivr.net/gh/warmahdi651-stack/app@arena/3fb7149b-app/releases/Windows-in-Mobile-v2.0.0.apk` | jsDelivr CDN (session branch) |
+| `https://warmahdi651-stack.github.io/app/Windows-in-Mobile-v2.0.1.apk` | Windows in Mobile v2.0.1 — GitHub Pages |
+| `https://github.com/warmahdi651-stack/app/raw/arena/3fb7149b-app/releases/Windows-in-Mobile-v2.0.1.apk` | GitHub raw (session branch) |
+| `https://cdn.jsdelivr.net/gh/warmahdi651-stack/app@arena/3fb7149b-app/releases/Windows-in-Mobile-v2.0.1.apk` | jsDelivr CDN (session branch) |
 | `https://github.com/warmahdi651-stack/app/raw/main/releases/windows-simulator.apk` | نسخهٔ قدیمی ۱٫۰٫۰ |
 
 - پکیج: `com.arena.windowsinmobile` — امضای v1 + v2 + v3 — اندروید ۵ به بالا — حدود ۳٫۳ مگابایت

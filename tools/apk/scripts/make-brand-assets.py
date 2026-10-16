@@ -17,7 +17,7 @@ except ImportError:
 subprocess.run([sys.executable, str(root / 'tools/apk/scripts/make-icons.py')], check=True)
 (root / 'tools/apk/android/assets').mkdir(parents=True, exist_ok=True)
 (root / 'tools/apk/android/assets' / 'release-v2.txt').write_text(
-    'Windows in Mobile 2.0.0\nEnglish • Left-to-right • WebView renderer recovery enabled\n',
+    'Windows in Mobile 2.0.1\nEnglish • Left-to-right • WebView renderer recovery enabled\n',
     encoding='utf-8',
 )
-print('Brand launcher resources prepared for Windows in Mobile v2.0.0.')
+print('Brand launcher resources prepared for Windows in Mobile v2.0.1.')

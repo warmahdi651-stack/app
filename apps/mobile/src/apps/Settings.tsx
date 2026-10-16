@@ -169,7 +169,7 @@ export function SettingsApp(_props: AppProps) {
         {section === 'system' ? (
           <>
             <SectionTitle text="System status" palette={palette} />
-            <Row icon="hardware-chip-outline" title="Version" subtitle={`Windows ${settings.shellVersion?.replace('win', '') ?? '11'} — Simulator 2.0.0`} palette={palette} />
+            <Row icon="hardware-chip-outline" title="Version" subtitle={`Windows ${settings.shellVersion?.replace('win', '') ?? '11'} — Simulator 2.0.1`} palette={palette} />
             <Row
               icon="server-outline"
               title="Storage"
@@ -305,7 +305,7 @@ export function SettingsApp(_props: AppProps) {
               <Ionicons name="logo-windows" size={38} color={palette.accent} />
               <Text style={[styles.aboutTitle, { color: palette.text }]}>Windows in Mobile</Text>
               <Text style={[styles.aboutSubtitle, { color: palette.textMuted }]}>
-                A Windows-inspired mobile desktop — Version 2.0.0
+                A Windows-inspired mobile desktop — Version 2.0.1
               </Text>
             </View>
             <Row icon="phone-portrait-outline" title="Built with" subtitle="React Native + Expo" palette={palette} />

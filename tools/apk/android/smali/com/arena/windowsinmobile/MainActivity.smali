@@ -71,13 +71,47 @@
 .end method
 
 # Renderer recovery entry point used by WebViewClient.onRenderProcessGone.
+# Android requires a WebView with a dead renderer to be removed and destroyed before retry.
 .method public reloadWebView()V
-    .registers 3
+    .registers 9
+    :try_start
     iget-object v0, p0, Lcom/arena/windowsinmobile/MainActivity;->webView:Landroid/webkit/WebView;
-    if-eqz v0, :reload_done
+    if-eqz v0, :create_replacement
+    invoke-virtual {v0}, Landroid/view/View;->getParent()Landroid/view/ViewParent;
+    move-result-object v5
+    instance-of v6, v5, Landroid/view/ViewGroup;
+    if-eqz v6, :destroy_old
+    check-cast v5, Landroid/view/ViewGroup;
+    invoke-virtual {v5, v0}, Landroid/view/ViewGroup;->removeView(Landroid/view/View;)V
+:destroy_old
+    invoke-virtual {v0}, Landroid/webkit/WebView;->destroy()V
+:create_replacement
+    new-instance v0, Landroid/webkit/WebView;
+    invoke-direct {v0, p0}, Landroid/webkit/WebView;-><init>(Landroid/content/Context;)V
+    iput-object v0, p0, Lcom/arena/windowsinmobile/MainActivity;->webView:Landroid/webkit/WebView;
+    const v1, -0xF4EDE0
+    invoke-virtual {v0, v1}, Landroid/webkit/WebView;->setBackgroundColor(I)V
+    invoke-virtual {v0}, Landroid/webkit/WebView;->getSettings()Landroid/webkit/WebSettings;
+    move-result-object v2
+    const/4 v3, 0x1
+    invoke-virtual {v2, v3}, Landroid/webkit/WebSettings;->setJavaScriptEnabled(Z)V
+    invoke-virtual {v2, v3}, Landroid/webkit/WebSettings;->setDomStorageEnabled(Z)V
+    invoke-virtual {v2, v3}, Landroid/webkit/WebSettings;->setAllowFileAccess(Z)V
+    invoke-virtual {v2, v3}, Landroid/webkit/WebSettings;->setAllowFileAccessFromFileURLs(Z)V
+    invoke-virtual {v2, v3}, Landroid/webkit/WebSettings;->setAllowContentAccess(Z)V
+    invoke-virtual {v2, v3}, Landroid/webkit/WebSettings;->setDatabaseEnabled(Z)V
+    invoke-virtual {v2, v3}, Landroid/webkit/WebSettings;->setUseWideViewPort(Z)V
+    invoke-virtual {v2, v3}, Landroid/webkit/WebSettings;->setLoadWithOverviewMode(Z)V
+    new-instance v4, Lcom/arena/windowsinmobile/MainActivity$WebViewClient;
+    invoke-direct {v4, p0}, Lcom/arena/windowsinmobile/MainActivity$WebViewClient;-><init>(Lcom/arena/windowsinmobile/MainActivity;)V
+    invoke-virtual {v0, v4}, Landroid/webkit/WebView;->setWebViewClient(Landroid/webkit/WebViewClient;)V
+    invoke-virtual {p0, v0}, Landroid/app/Activity;->setContentView(Landroid/view/View;)V
     const-string v1, "file:///android_asset/index.html"
     invoke-virtual {v0, v1}, Landroid/webkit/WebView;->loadUrl(Ljava/lang/String;)V
-:reload_done
+    :try_end
+    .catch Ljava/lang/Throwable; {:try_start .. :try_end} :recovery_failed
+    return-void
+:recovery_failed
     return-void
 .end method
 
@@ -89,7 +123,7 @@
     if-eqz v0, :fail
     new-instance v1, Landroid/content/Intent;
     const-string v2, "android.intent.action.VIEW"
-    invoke-virtual {v1, v2, v0}, Landroid/content/Intent;-><init>(Ljava/lang/String;Landroid/net/Uri;)V
+    invoke-direct {v1, v2, v0}, Landroid/content/Intent;-><init>(Ljava/lang/String;Landroid/net/Uri;)V
     const/high16 v2, 0x10000000
     invoke-virtual {v1, v2}, Landroid/content/Intent;->addFlags(I)Landroid/content/Intent;
     :try_start
