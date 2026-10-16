@@ -62,7 +62,7 @@ export class ApiClient {
         body: body === undefined ? undefined : JSON.stringify(body),
       });
     } catch {
-      throw new ApiError(0, 'network_error', 'ارتباط با سرور برقرار نشد.');
+      throw new ApiError(0, 'network_error', 'Could not connect to the server.');
     }
 
     const text = await response.text();
@@ -73,7 +73,7 @@ export class ApiClient {
       throw new ApiError(
         response.status,
         error?.code ?? 'http_error',
-        error?.message ?? 'خطای نامشخص از سمت سرور.',
+        error?.message ?? 'Unknown server error.',
       );
     }
 

@@ -70,7 +70,18 @@
     return-void
 .end method
 
-# باز کردن یک آدرس بیرونی در مرورگر دستگاه
+# Renderer recovery entry point used by WebViewClient.onRenderProcessGone.
+.method public reloadWebView()V
+    .registers 3
+    iget-object v0, p0, Lcom/arena/windowsinmobile/MainActivity;->webView:Landroid/webkit/WebView;
+    if-eqz v0, :reload_done
+    const-string v1, "file:///android_asset/index.html"
+    invoke-virtual {v0, v1}, Landroid/webkit/WebView;->loadUrl(Ljava/lang/String;)V
+:reload_done
+    return-void
+.end method
+
+# Open an external address in the device browser.
 .method public openExternal(Ljava/lang/String;)Z
     .registers 5
     invoke-static {p1}, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;

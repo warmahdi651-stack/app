@@ -149,7 +149,7 @@ export function WindowProvider({ children }: { children: React.ReactNode }) {
     if (saved?.length) dispatch({ type: 'hydrate', windows: saved });
   }, []);
 
-  // پس از ورود کاربر، چیدمان پنجره‌های ذخیره‌شده روی سرور بازیابی می‌شود
+  // پس از Sign in کاربر، چیدمان پنجره‌های Save‌شده روی سرور بازیابی می‌شود
   const { status: authStatus } = useAuth();
   useEffect(() => {
     if (authStatus !== 'authenticated') return;
@@ -226,6 +226,6 @@ export function WindowProvider({ children }: { children: React.ReactNode }) {
 
 export function useWindows(): WindowContextValue {
   const ctx = useContext(WindowContext);
-  if (!ctx) throw new Error('useWindows باید داخل WindowProvider استفاده شود.');
+  if (!ctx) throw new Error('useWindows must be used inside WindowProvider.');
   return ctx;
 }

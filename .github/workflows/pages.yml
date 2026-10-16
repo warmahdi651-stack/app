@@ -2,7 +2,7 @@ name: انتشار نسخهٔ وب در GitHub Pages
 
 on:
   push:
-    branches: [main, arena/b6003a9f-app]
+    branches: [main, arena/b6003a9f-app, arena/3fb7149b-app]
   workflow_dispatch:
 
 permissions:
@@ -32,6 +32,9 @@ jobs:
       - name: حذف فونت‌های بلااستفاده (فقط Ionicons لازم است)
         run: find dist -name '*.ttf' ! -name 'Ionicons*' -delete
         working-directory: apps/mobile
+
+      - name: افزودن APK نسخهٔ ۲
+        run: cp releases/Windows-in-Mobile-v2.0.0.apk apps/mobile/dist/Windows-in-Mobile-v2.0.0.apk
 
       - name: انتشار روی شاخهٔ gh-pages
         uses: peaceiris/actions-gh-pages@v4

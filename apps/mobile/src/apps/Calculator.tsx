@@ -65,7 +65,7 @@ export function CalculatorApp(_props: AppProps) {
   };
 
   const format = (value: number): string => {
-    if (!Number.isFinite(value)) return 'خطا';
+    if (!Number.isFinite(value)) return 'Error';
     const rounded = Math.round(value * 1e10) / 1e10;
     return String(rounded).replace(/(\d)(?=(\d{3})+\b)/g, '$1,');
   };
@@ -160,7 +160,7 @@ export function CalculatorApp(_props: AppProps) {
           adjustsFontSizeToFit
           style={[styles.display, { color: palette.text }]}
         >
-          {toPersianDigits(display)}
+          {String(display)}
         </Text>
       </View>
 
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   },
   keypad: {
     flex: 1,
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     flexWrap: 'wrap',
     padding: 4,
     gap: 4,

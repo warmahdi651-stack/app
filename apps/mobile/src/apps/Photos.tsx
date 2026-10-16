@@ -8,15 +8,15 @@ import type { AppProps } from '../registry';
 type Photo = { id: string; title: string; colors: [string, string]; accent: string };
 
 const PHOTOS: Photo[] = [
-  { id: 'p1', title: 'کوهستان', colors: ['#1e3c72', '#7f7fd5'], accent: '#f2b544' },
-  { id: 'p2', title: 'غروب', colors: ['#d76d77', '#ffaf7b'], accent: '#3a1c71' },
-  { id: 'p3', title: 'جنگل', colors: ['#093028', '#5fbb8b'], accent: '#c9f7d3' },
-  { id: 'p4', title: 'شب', colors: ['#0f2027', '#2c5364'], accent: '#8be9fd' },
-  { id: 'p5', title: 'شقایق', colors: ['#2f0743', '#c471ed'], accent: '#ffd6f5' },
-  { id: 'p6', title: 'اقیانوس', colors: ['#0b486b', '#f8b500'], accent: '#fdf6b2' },
-  { id: 'p7', title: 'شبنم', colors: ['#237a57', '#93f9b9'], accent: '#0b486b' },
-  { id: 'p8', title: 'آجر', colors: ['#870000', '#190a05'], accent: '#f7b733' },
-  { id: 'p9', title: 'نیلی', colors: ['#141e30', '#243b55'], accent: '#64ffda' },
+  { id: 'p1', title: 'Mountains', colors: ['#1e3c72', '#7f7fd5'], accent: '#f2b544' },
+  { id: 'p2', title: 'Sunset', colors: ['#d76d77', '#ffaf7b'], accent: '#3a1c71' },
+  { id: 'p3', title: 'Forest', colors: ['#093028', '#5fbb8b'], accent: '#c9f7d3' },
+  { id: 'p4', title: 'Night', colors: ['#0f2027', '#2c5364'], accent: '#8be9fd' },
+  { id: 'p5', title: 'Poppy', colors: ['#2f0743', '#c471ed'], accent: '#ffd6f5' },
+  { id: 'p6', title: 'Ocean', colors: ['#0b486b', '#f8b500'], accent: '#fdf6b2' },
+  { id: 'p7', title: 'Dew', colors: ['#237a57', '#93f9b9'], accent: '#0b486b' },
+  { id: 'p8', title: 'Brick', colors: ['#870000', '#190a05'], accent: '#f7b733' },
+  { id: 'p9', title: 'Indigo', colors: ['#141e30', '#243b55'], accent: '#64ffda' },
 ];
 
 function PhotoArt({ photo, size }: { photo: Photo; size: number }) {
@@ -48,7 +48,7 @@ export function PhotosApp(_props: AppProps) {
             <PhotoArt photo={selected} size={260} />
           </View>
           <Text style={[styles.viewerTitle, { color: palette.text }]}>{selected.title}</Text>
-          <Text style={[styles.viewerHint, { color: palette.textMuted }]}>برای بازگشت روی تصویر ضربه بزنید.</Text>
+          <Text style={[styles.viewerHint, { color: palette.textMuted }]}>Tap the image to go back.</Text>
         </Pressable>
       </View>
     );
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   grid: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     flexWrap: 'wrap',
     padding: 8,
     gap: 8,
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   caption: {
     fontFamily: fonts.regular,
     fontSize: typeScale.small,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   viewer: {
     flex: 1,
@@ -116,11 +116,11 @@ const styles = StyleSheet.create({
   viewerTitle: {
     fontFamily: fonts.bold,
     fontSize: typeScale.title,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   viewerHint: {
     fontFamily: fonts.regular,
     fontSize: typeScale.small,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
 });

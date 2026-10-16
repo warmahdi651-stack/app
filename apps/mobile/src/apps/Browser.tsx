@@ -16,52 +16,52 @@ type Page = { title: string; blocks: Block[] };
 
 const PAGES: Record<string, Page> = {
   'home://': {
-    title: 'خانه',
+    title: 'Home',
     blocks: [
-      { kind: 'heading', text: 'خوش آمدید' },
-      { kind: 'text', text: 'این یک مرورگر شبیه‌سازی‌شده است که فقط صفحه‌های داخلی را نمایش می‌دهد.' },
+      { kind: 'heading', text: 'Welcome' },
+      { kind: 'text', text: 'This is a simulated browser for local pages only.' },
       { kind: 'tiles' },
     ],
   },
   'win.local': {
-    title: 'خوش‌آمدید به ویندوز',
+    title: 'Welcome to Windows',
     blocks: [
-      { kind: 'heading', text: 'ویندوز در گوشی شما' },
-      { kind: 'text', text: 'با نوار پایین می‌توانید برنامه‌ها را باز کنید و پنجره‌ها را همان‌طور که در ویندوز واقعی جابه‌جا می‌کنید.' },
-      { kind: 'text', text: 'برای شروع، پوشهٔ «اسناد» را باز کنید و فایل خوش‌آمدید.txt را بخوانید.' },
-      { kind: 'link', text: 'رفتن به خانه', target: 'home://' },
+      { kind: 'heading', text: 'Windows on your phone' },
+      { kind: 'text', text: 'Open apps from the taskbar and drag windows just like on a Windows PC.' },
+      { kind: 'text', text: 'To get started, open Documents and read Welcome.txt.' },
+      { kind: 'link', text: 'Go Home', target: 'home://' },
     ],
   },
   'news.local': {
-    title: 'اخبار',
+    title: 'News',
     blocks: [
-      { kind: 'heading', text: 'تازه‌ترین اخبار فناوری' },
-      { kind: 'text', text: '• شبیه‌سازی دسکتاپ ویندوز روی موبایل رونق گرفته است.' },
-      { kind: 'text', text: '• محاسبات ابری به رکورد جدید دست یافت.' },
-      { kind: 'text', text: '• مرورگرهای داخلی، جای اینترنت واقعی را می‌گیرند.' },
-      { kind: 'link', text: 'بازگشت به خانه', target: 'home://' },
+      { kind: 'heading', text: 'Latest technology news' },
+      { kind: 'text', text: '• Windows desktop simulation on mobile is growing.' },
+      { kind: 'text', text: '• Cloud computing reached a new record.' },
+      { kind: 'text', text: '• Built-in browsers replace the real internet.' },
+      { kind: 'link', text: 'Back Home', target: 'home://' },
     ],
   },
   'mail.local': {
-    title: 'ایمیل',
+    title: 'Mail',
     blocks: [
-      { kind: 'heading', text: 'صندوق ورودی' },
-      { kind: 'text', text: '۱) پروژهٔ جدید شما آماده است — به زودی جلسه‌ای می‌گذاریم.' },
-      { kind: 'text', text: '۲) گزارش ماهانه آمادهٔ بررسی است.' },
-      { kind: 'text', text: '۳) یادآوری: پشتیبان‌گیری از فایل‌ها را فراموش نکنید.' },
-      { kind: 'link', text: 'بازگشت به خانه', target: 'home://' },
+      { kind: 'heading', text: 'Inbox' },
+      { kind: 'text', text: '1) Your new project is ready — we will schedule a meeting soon.' },
+      { kind: 'text', text: '2) The monthly report is ready for review.' },
+      { kind: 'text', text: '3) Reminder: do not forget to back up your files.' },
+      { kind: 'link', text: 'Back Home', target: 'home://' },
     ],
   },
   'about:blank': {
-    title: 'صفحهٔ خالی',
+    title: 'Blank page',
     blocks: [{ kind: 'text', text: '' }],
   },
 };
 
 const TILES = [
-  { label: 'خوش‌آمدید', target: 'win.local', icon: 'logo-windows' as const, color: '#0a6cff' },
-  { label: 'اخبار', target: 'news.local', icon: 'newspaper-outline' as const, color: '#e0523c' },
-  { label: 'ایمیل', target: 'mail.local', icon: 'mail-outline' as const, color: '#7f5af0' },
+  { label: 'Welcome', target: 'win.local', icon: 'logo-windows' as const, color: '#0a6cff' },
+  { label: 'News', target: 'news.local', icon: 'newspaper-outline' as const, color: '#e0523c' },
+  { label: 'Mail', target: 'mail.local', icon: 'mail-outline' as const, color: '#7f5af0' },
 ];
 
 export function BrowserApp(_props: AppProps) {
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   toolbar: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     paddingHorizontal: 6,
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   },
   address: {
     flex: 1,
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     borderWidth: StyleSheet.hairlineWidth,
@@ -220,26 +220,26 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontFamily: fonts.bold,
     fontSize: typeScale.heading,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   heading: {
     fontFamily: fonts.bold,
     fontSize: typeScale.title,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   paragraph: {
     fontFamily: fonts.regular,
     fontSize: typeScale.body,
     lineHeight: 21,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   link: {
     fontFamily: fonts.medium,
     fontSize: typeScale.body,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   tiles: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     gap: 10,
     marginTop: 10,
   },
@@ -255,6 +255,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     fontSize: typeScale.small + 1,
     color: '#fff',
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
 });

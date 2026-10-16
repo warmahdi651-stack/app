@@ -70,10 +70,10 @@ export function PaintApp(_props: AppProps) {
 
   const save = async () => {
     const payload = JSON.stringify({ width: size_.width, height: size_.height, strokes });
-    const name = `نقاشی-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.paint`;
+    const name = `Paint-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.paint`;
     const home = vfs.root?.id ?? null;
     await vfs.createFile(home, name, payload);
-    setStatus(`«${name}» ذخیره شد.`);
+    setStatus(`«${name}» Saved.`);
     setTimeout(() => setStatus(''), 2000);
   };
 
@@ -137,21 +137,21 @@ export function PaintApp(_props: AppProps) {
           ]}
         >
           <Ionicons name="backspace-outline" size={13} color={erasing ? palette.accent : palette.textMuted} />
-          <Text style={[styles.actionText, { color: erasing ? palette.accent : palette.textMuted }]}>پاک‌کن</Text>
+          <Text style={[styles.actionText, { color: erasing ? palette.accent : palette.textMuted }]}>Eraser</Text>
         </Pressable>
         <Pressable
           onPress={() => setStrokes([])}
           style={[styles.action, { backgroundColor: 'transparent', borderColor: palette.border }]}
         >
           <Ionicons name="trash-outline" size={13} color={palette.textMuted} />
-          <Text style={[styles.actionText, { color: palette.textMuted }]}>پاک کردن بوم</Text>
+          <Text style={[styles.actionText, { color: palette.textMuted }]}>Clear canvas</Text>
         </Pressable>
         <Pressable
           onPress={save}
           style={[styles.action, { backgroundColor: palette.accent, borderColor: palette.accent }]}
         >
           <Ionicons name="save-outline" size={13} color={palette.textOnAccent} />
-          <Text style={[styles.actionText, { color: palette.textOnAccent }]}>ذخیره</Text>
+          <Text style={[styles.actionText, { color: palette.textOnAccent }]}>Save</Text>
         </Pressable>
       </View>
 
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   toolbar: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     paddingHorizontal: 8,
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   toolbarSecondary: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     paddingHorizontal: 8,
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   action: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     paddingHorizontal: 8,
@@ -247,6 +247,6 @@ const styles = StyleSheet.create({
     fontSize: typeScale.small,
     textAlign: 'center',
     paddingBottom: 6,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
 });

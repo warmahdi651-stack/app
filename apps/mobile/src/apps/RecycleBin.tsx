@@ -21,17 +21,17 @@ export function RecycleBinApp(_props: AppProps) {
     <View style={[styles.root, { backgroundColor: palette.surface }]}>
       <View style={[styles.toolbar, { borderBottomColor: palette.border }]}>
         <Text style={[styles.count, { color: palette.text }]}>
-          {vfs.trashNodes.length} مورد در سطل زباله
+          {vfs.trashNodes.length} items in Recycle Bin
         </Text>
         <View style={{ flex: 1 }} />
         <AppButton
-          label="خالی کردن سطل"
+          label="Empty bin"
           icon="trash-outline"
           palette={palette}
           variant="danger"
           onPress={async () => {
             await vfs.emptyTrash();
-            flash('سطل زباله خالی شد.');
+            flash('Recycle Bin emptied.');
           }}
         />
       </View>
@@ -40,8 +40,8 @@ export function RecycleBinApp(_props: AppProps) {
         {vfs.trashNodes.length === 0 ? (
           <EmptyState
             icon="trash-outline"
-            title="سطل زباله خالی است"
-            subtitle="فایل‌های حذف‌شده اینجا نگه داشته می‌شوند."
+            title="Recycle Bin is empty"
+            subtitle="Deleted files are kept here."
             palette={palette}
           />
         ) : (
@@ -60,13 +60,13 @@ export function RecycleBinApp(_props: AppProps) {
                   {node.name}
                 </Text>
                 <Text style={[styles.itemMeta, { color: palette.textMuted }]}>
-                  حذف‌شده در {node.deletedAt ? new Date(node.deletedAt).toLocaleString('fa-IR') : '—'}
+                  Deleted {node.deletedAt ? new Date(node.deletedAt).toLocaleString('en-US') : '—'}
                 </Text>
               </View>
               <Pressable
                 onPress={async () => {
                   await vfs.restore(node.id);
-                  flash(`«${node.name}» بازیابی شد.`);
+                  flash(`“${node.name}” restored.`);
                 }}
                 style={styles.iconButton}
               >
@@ -75,7 +75,7 @@ export function RecycleBinApp(_props: AppProps) {
               <Pressable
                 onPress={async () => {
                   await vfs.purge(node.id);
-                  flash(`«${node.name}» برای همیشه حذف شد.`);
+                  flash(`“${node.name}” permanently deleted.`);
                 }}
                 style={styles.iconButton}
               >
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   toolbar: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: 10,
@@ -108,14 +108,14 @@ const styles = StyleSheet.create({
   count: {
     fontFamily: fonts.medium,
     fontSize: typeScale.body,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   list: {
     padding: 10,
     gap: 8,
   },
   item: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     padding: 10,
@@ -128,12 +128,12 @@ const styles = StyleSheet.create({
   itemTitle: {
     fontFamily: fonts.regular,
     fontSize: typeScale.body,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   itemMeta: {
     fontFamily: fonts.regular,
     fontSize: typeScale.small,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   iconButton: {
     width: 26,
@@ -146,6 +146,6 @@ const styles = StyleSheet.create({
     fontSize: typeScale.small,
     textAlign: 'center',
     paddingBottom: 6,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
 });

@@ -54,7 +54,7 @@ export function NotesApp(_props: AppProps) {
   const createNote = async () => {
     const note: Note = {
       id: uid('note'),
-      title: 'یادداشت جدید',
+      title: 'Note New',
       body: '',
       pinned: false,
       updatedAt: new Date().toISOString(),
@@ -69,14 +69,14 @@ export function NotesApp(_props: AppProps) {
   const saveNote = async (id: string) => {
     const updated = notes.map((note) =>
       note.id === id
-        ? { ...note, title: draftTitle || 'بدون‌عنوان', body: draftBody, updatedAt: new Date().toISOString() }
+        ? { ...note, title: draftTitle || 'Untitled', body: draftBody, updatedAt: new Date().toISOString() }
         : note,
     );
     setNotes(updated);
     await persistLocal(updated);
     if (auth.status === 'authenticated') {
       try {
-        await api.put(`/api/notes/${id}`, { title: draftTitle || 'بدون‌عنوان', body: draftBody });
+        await api.put(`/api/notes/${id}`, { title: draftTitle || 'Untitled', body: draftBody });
         setSynced(true);
       } catch {
         setSynced(false);
@@ -108,7 +108,7 @@ export function NotesApp(_props: AppProps) {
           <Pressable onPress={() => setSelectedId(null)} style={styles.backButton}>
             <Ionicons name="arrow-back" size={15} color={palette.text} />
           </Pressable>
-          <AppButton label="ذخیره" palette={palette} variant="primary" onPress={() => void saveNote(selectedId)} />
+          <AppButton label="Save" palette={palette} variant="primary" onPress={() => void saveNote(selectedId)} />
           <View style={{ flex: 1 }} />
           <Pressable onPress={() => void removeNote(selectedId)} style={styles.backButton}>
             <Ionicons name="trash-outline" size={15} color={palette.danger} />
@@ -118,7 +118,7 @@ export function NotesApp(_props: AppProps) {
           <Field
             value={draftTitle}
             onChangeText={setDraftTitle}
-            placeholder="عنوان"
+            placeholder="Title"
             palette={palette}
             autoCapitalize="words"
             style={styles.titleInput}
@@ -126,7 +126,7 @@ export function NotesApp(_props: AppProps) {
           <Field
             value={draftBody}
             onChangeText={setDraftBody}
-            placeholder="متن یادداشت..."
+            placeholder="Text Note..."
             palette={palette}
             multiline
             autoCapitalize="sentences"
@@ -134,7 +134,7 @@ export function NotesApp(_props: AppProps) {
           />
           {note ? (
             <Text style={[styles.updated, { color: palette.textMuted }]}>
-              آخرین ویرایش: {new Date(note.updatedAt).toLocaleString('fa-IR')}
+              Last edit: {new Date(note.updatedAt).toLocaleString('en-US')}
             </Text>
           ) : null}
         </View>
@@ -145,19 +145,19 @@ export function NotesApp(_props: AppProps) {
   return (
     <View style={[styles.root, { backgroundColor: palette.surface }]}>
       <View style={[styles.listBar, { borderBottomColor: palette.border }]}>
-        <Text style={[styles.listTitle, { color: palette.text }]}>یادداشت‌ها</Text>
+        <Text style={[styles.listTitle, { color: palette.text }]}>Notes</Text>
         <View style={{ flex: 1 }} />
         <Text style={[styles.syncBadge, { color: synced ? palette.success : palette.textMuted }]}>
-          {synced ? 'همگام' : 'محلی'}
+          {synced ? 'Synced' : 'Local'}
         </Text>
-        <AppButton label="جدید" icon="add" palette={palette} variant="primary" onPress={() => void createNote()} />
+        <AppButton label="New" icon="add" palette={palette} variant="primary" onPress={() => void createNote()} />
       </View>
       <ScrollView contentContainerStyle={styles.list}>
         {notes.length === 0 ? (
           <EmptyState
             icon="document-text-outline"
-            title="یادداشتی ندارید"
-            subtitle="با دکمهٔ «جدید» اولین یادداشت را بسازید."
+            title="No notes yet"
+            subtitle="Create your first note with the New button."
             palette={palette}
           />
         ) : (
@@ -177,7 +177,7 @@ export function NotesApp(_props: AppProps) {
                 {note.title}
               </Text>
               <Text numberOfLines={2} style={[styles.noteBody, { color: palette.textMuted }]}>
-                {note.body || '(خالی)'}
+                {note.body || '(Empty)'}
               </Text>
             </Pressable>
           ))
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listBar: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: 10,
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   listTitle: {
     fontFamily: fonts.bold,
     fontSize: typeScale.title,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   syncBadge: {
     fontFamily: fonts.regular,
@@ -221,16 +221,16 @@ const styles = StyleSheet.create({
   noteTitle: {
     fontFamily: fonts.medium,
     fontSize: typeScale.body,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   noteBody: {
     fontFamily: fonts.regular,
     fontSize: typeScale.small + 1,
     lineHeight: 18,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   editorBar: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: 8,
@@ -259,6 +259,6 @@ const styles = StyleSheet.create({
   updated: {
     fontFamily: fonts.regular,
     fontSize: typeScale.small,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
 });

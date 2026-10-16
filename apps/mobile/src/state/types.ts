@@ -22,7 +22,10 @@ export type WindowInstance = {
   props: Record<string, unknown>;
 };
 
+export type ShellVersion = 'win7' | 'win8' | 'win10' | 'win11';
+
 export type ShellSettings = {
+  shellVersion?: ShellVersion;
   theme: 'light' | 'dark';
   wallpaper: string;
   userName: string;

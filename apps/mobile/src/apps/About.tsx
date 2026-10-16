@@ -2,8 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Row, SectionTitle } from '../components/ui';
-import { formatJalaliLong } from '../lib/jalali';
-import { toPersianDigits } from '../lib/fa';
 import { useShell } from '../state/ShellProvider';
 import { useVfs } from '../state/VfsProvider';
 import { fonts, typeScale } from '../theme';
@@ -18,37 +16,37 @@ export function AboutApp(_props: AppProps) {
     <ScrollView style={{ backgroundColor: palette.surface }} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <Ionicons name="logo-windows" size={44} color={palette.accent} />
-        <Text style={[styles.title, { color: palette.text }]}>ویندوز در موبایل</Text>
+        <Text style={[styles.title, { color: palette.text }]}>Windows in Mobile</Text>
         <Text style={[styles.subtitle, { color: palette.textMuted }]}>
-          نسخهٔ ۱٫۰٫۰ — ساخته‌شده با React Native و Expo
+          Version 2.0.0 — Built with React Native and Expo
         </Text>
       </View>
 
-      <SectionTitle text="دستگاه" palette={palette} />
-      <Row icon="phone-portrait-outline" title="نام کاربر" subtitle={settings.userName || 'کاربر'} palette={palette} />
-      <Row icon="time-outline" title="تاریخ امروز" subtitle={formatJalaliLong(new Date())} palette={palette} />
+      <SectionTitle text="Device" palette={palette} />
+      <Row icon="phone-portrait-outline" title="User name" subtitle={settings.userName || 'User'} palette={palette} />
+      <Row icon="time-outline" title="Today" subtitle={new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })} palette={palette} />
       <Row
         icon="server-outline"
-        title="فضای ذخیره‌سازی"
-        subtitle={`${toPersianDigits(files.length)} مورد در دیسک مجازی`}
+        title="Storage"
+        subtitle={`${files.length} items on the virtual disk`}
         palette={palette}
       />
       <Row
         icon="cloud-outline"
-        title="وضعیت ذخیره‌سازی"
-        subtitle={vfs.offline ? 'آفلاین — فقط روی دستگاه' : 'ذخیره‌سازی ابری فعال است'}
+        title="Storage status"
+        subtitle={vfs.offline ? 'Offline — on this device only' : 'Cloud storage is enabled'}
         palette={palette}
       />
 
-      <SectionTitle text="برنامه‌های نصب‌شده" palette={palette} />
-      <Row icon="folder-open-outline" title="File Explorer" subtitle="مدیریت فایل‌ها" palette={palette} />
-      <Row icon="document-text-outline" title="Notepad" subtitle="ویرایشگر متن" palette={palette} />
-      <Row icon="terminal-outline" title="Terminal" subtitle="خط فرمان" palette={palette} />
-      <Row icon="calculator-outline" title="Calculator" subtitle="ماشین‌حساب" palette={palette} />
-      <Row icon="color-palette-outline" title="Paint" subtitle="نقاشی" palette={palette} />
-      <Row icon="globe-outline" title="Browser" subtitle="مرورگر داخلی" palette={palette} />
-      <Row icon="images-outline" title="Photos" subtitle="گالری تصاویر" palette={palette} />
-      <Row icon="reader-outline" title="Sticky Notes" subtitle="یادداشت‌ها" palette={palette} />
+      <SectionTitle text="Installed apps" palette={palette} />
+      <Row icon="folder-open-outline" title="File Explorer" subtitle="File management" palette={palette} />
+      <Row icon="document-text-outline" title="Notepad" subtitle="Text editor" palette={palette} />
+      <Row icon="terminal-outline" title="Terminal" subtitle="Command line" palette={palette} />
+      <Row icon="calculator-outline" title="Calculator" subtitle="Calculator" palette={palette} />
+      <Row icon="color-palette-outline" title="Paint" subtitle="Paint" palette={palette} />
+      <Row icon="globe-outline" title="Browser" subtitle="Built-in browser" palette={palette} />
+      <Row icon="images-outline" title="Photos" subtitle="Photo gallery" palette={palette} />
+      <Row icon="reader-outline" title="Sticky Notes" subtitle="Notes" palette={palette} />
     </ScrollView>
   );
 }
@@ -66,12 +64,12 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: fonts.bold,
     fontSize: typeScale.heading,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   subtitle: {
     fontFamily: fonts.regular,
     fontSize: typeScale.small,
     textAlign: 'center',
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
 });

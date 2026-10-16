@@ -104,21 +104,21 @@ export function ExplorerApp({ props }: AppProps) {
       x: Math.max(4, Math.min(x, 220)),
       y: Math.max(4, Math.min(y, 240)),
       items: [
-        { key: 'open', label: 'باز کردن', icon: 'open-outline', onPress: () => openItem(node.id) },
+        { key: 'open', label: 'Open', icon: 'open-outline', onPress: () => openItem(node.id) },
         {
           key: 'rename',
-          label: 'تغییر نام',
+          label: 'Rename',
           icon: 'pencil-outline',
           onPress: () => setDialog({ mode: 'rename', nodeId: node.id, value: node.name }),
         },
         {
           key: 'delete',
-          label: 'انتقال به سطل زباله',
+          label: 'Move to Recycle Bin',
           icon: 'trash-outline',
           danger: true,
           onPress: async () => {
             await vfs.trash(node.id);
-            setToast(`«${node.name}» به سطل زباله منتقل شد.`);
+            setToast(`“${node.name}” moved to Recycle Bin.`);
           },
         },
       ],
@@ -161,8 +161,8 @@ export function ExplorerApp({ props }: AppProps) {
         />
         <ToolButton
           icon="folder-open-outline"
-          label="پوشهٔ جدید"
-          onPress={() => setDialog({ mode: 'newFolder', value: 'پوشهٔ جدید' })}
+          label="New folder"
+          onPress={() => setDialog({ mode: 'newFolder', value: 'New folder' })}
           palette={palette}
         />
       </View>
@@ -173,7 +173,7 @@ export function ExplorerApp({ props }: AppProps) {
           {address || 'C:'}
         </Text>
         <Text style={[styles.count, { color: palette.textMuted }]}>
-          {items.length} مورد
+          {items.length} items
         </Text>
       </View>
 
@@ -183,7 +183,7 @@ export function ExplorerApp({ props }: AppProps) {
           <Field
             value={query}
             onChangeText={setQuery}
-            placeholder="جست‌وجو در این پوشه..."
+            placeholder="Search this folder..."
             palette={palette}
             style={styles.searchInput}
           />
@@ -203,8 +203,8 @@ export function ExplorerApp({ props }: AppProps) {
         {items.length === 0 ? (
           <EmptyState
             icon="folder-open-outline"
-            title="این پوشه خالی است"
-            subtitle="می‌توانید با دکمهٔ «پوشهٔ جدید» یک پوشه بسازید."
+            title="This folder is empty"
+            subtitle="Create a folder with the New folder button."
             palette={palette}
           />
         ) : viewMode === 'grid' ? (
@@ -251,7 +251,7 @@ export function ExplorerApp({ props }: AppProps) {
                   {node.name}
                 </Text>
                 <Text style={[styles.listMeta, { color: palette.textMuted }]}>
-                  {node.kind === 'folder' ? 'پوشه' : `${node.content.length} نویسه`}
+                  {node.kind === 'folder' ? 'Folder' : `${node.content.length} characters`}
                 </Text>
               </Pressable>
             ))}
@@ -286,18 +286,18 @@ export function ExplorerApp({ props }: AppProps) {
 
       <Dialog
         visible={dialog !== null}
-        title={dialog?.mode === 'rename' ? 'تغییر نام' : 'پوشهٔ جدید'}
+        title={dialog?.mode === 'rename' ? 'Rename' : 'New folder'}
         palette={palette}
         inputValue={dialog?.value ?? ''}
         onChangeInput={(text) => setDialog((d) => (d ? { ...d, value: text } : d))}
-        inputPlaceholder="نام"
+        inputPlaceholder="Name"
         onCancel={() => setDialog(null)}
         onConfirm={async () => {
           if (!dialog) return;
           if (dialog.mode === 'rename' && dialog.nodeId) {
-            await vfs.rename(dialog.nodeId, dialog.value.trim() || 'بدون‌نام');
+            await vfs.rename(dialog.nodeId, dialog.value.trim() || 'Untitled');
           } else {
-            await vfs.createFolder(folderId, dialog.value.trim() || 'پوشهٔ جدید');
+            await vfs.createFolder(folderId, dialog.value.trim() || 'New folder');
           }
           setDialog(null);
         }}
@@ -307,11 +307,11 @@ export function ExplorerApp({ props }: AppProps) {
 }
 
 const FOLDER_LABELS: Record<string, string> = {
-  Documents: 'اسناد',
-  Desktop: 'دسکتاپ',
-  Pictures: 'تصاویر',
-  Downloads: 'دانلودها',
-  Music: 'موسیقی',
+  Documents: 'Documents',
+  Desktop: 'Desktop',
+  Pictures: 'Photos',
+  Downloads: 'Downloads',
+  Music: 'Music',
 };
 
 const styles = StyleSheet.create({
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   toolbar: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
     paddingHorizontal: 6,
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   addressBar: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     paddingHorizontal: 10,
@@ -339,14 +339,14 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     fontSize: typeScale.small + 1,
     writingDirection: 'ltr',
-    textAlign: 'right',
+    textAlign: 'left',
   },
   count: {
     fontFamily: fonts.regular,
     fontSize: typeScale.small,
   },
   searchRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     paddingHorizontal: 10,
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   grid: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     flexWrap: 'wrap',
   },
   gridItem: {
@@ -379,10 +379,10 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     fontSize: typeScale.small + 1,
     textAlign: 'center',
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   listItem: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: 6,
@@ -393,14 +393,14 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: fonts.regular,
     fontSize: typeScale.body,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   listMeta: {
     fontFamily: fonts.regular,
     fontSize: typeScale.small,
   },
   quickRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
     paddingHorizontal: 10,
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
   },
   quickItem: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
@@ -428,6 +428,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     fontSize: typeScale.small + 1,
     textAlign: 'center',
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
 });

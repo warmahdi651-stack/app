@@ -131,12 +131,12 @@ export const typeScale = {
 
 /** رنگ‌های پس‌زمینهٔ دسکتاپ (گرادیان‌ها) */
 export const wallpapers: { id: string; label: string; colors: [string, string, ...string[]] }[] = [
-  { id: 'bloom', label: 'شکوفه', colors: ['#1e3c72', '#2a5298', '#7f7fd5'] },
-  { id: 'sunset', label: 'غروب', colors: ['#3a1c71', '#d76d77', '#ffaf7b'] },
-  { id: 'forest', label: 'جنگل', colors: ['#093028', '#237a57', '#5fbb8b'] },
-  { id: 'graphite', label: 'گرافیت', colors: ['#0f2027', '#203a43', '#2c5364'] },
-  { id: 'sakura', label: 'ساکورا', colors: ['#41295a', '#2f0743', '#c471ed'] },
-  { id: 'ocean', label: 'اقیانوس', colors: ['#0b486b', '#f56217', '#f8b500'] },
+  { id: 'bloom', label: 'Bloom', colors: ['#1e3c72', '#2a5298', '#7f7fd5'] },
+  { id: 'sunset', label: 'Sunset', colors: ['#3a1c71', '#d76d77', '#ffaf7b'] },
+  { id: 'forest', label: 'Forest', colors: ['#093028', '#237a57', '#5fbb8b'] },
+  { id: 'graphite', label: 'Graphite', colors: ['#0f2027', '#203a43', '#2c5364'] },
+  { id: 'sakura', label: 'Sakura', colors: ['#41295a', '#2f0743', '#c471ed'] },
+  { id: 'ocean', label: 'Ocean', colors: ['#0b486b', '#f56217', '#f8b500'] },
 ];
 
 export const getWallpaper = (id: string) => wallpapers.find((w) => w.id === id) ?? wallpapers[0]!;

@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: fonts.regular,
     fontSize: typeScale.body,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   separator: {
     height: StyleSheet.hairlineWidth,

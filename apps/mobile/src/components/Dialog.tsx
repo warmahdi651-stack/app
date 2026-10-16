@@ -3,7 +3,7 @@ import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { fonts, radius, typeScale, type Palette } from '../theme';
 import { AppButton, Field } from './ui';
 
-/** پنجرهٔ گفت‌وگوی کوچک داخل خود برنامه */
+/** پنجرهٔ گفت‌وگوی کوچک داخل خود برNameه */
 export function Dialog({
   visible,
   title,
@@ -12,8 +12,8 @@ export function Dialog({
   inputValue,
   onChangeInput,
   inputPlaceholder,
-  confirmLabel = 'تأیید',
-  cancelLabel = 'انصراف',
+  confirmLabel = 'Confirm',
+  cancelLabel = 'Cancel',
   onConfirm,
   onCancel,
   danger,
@@ -92,16 +92,16 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: fonts.bold,
     fontSize: typeScale.title,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   message: {
     fontFamily: fonts.regular,
     fontSize: typeScale.body,
     lineHeight: 20,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   actions: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     justifyContent: 'flex-start',
     gap: 8,
     marginTop: 4,

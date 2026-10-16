@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   },
   titleBar: {
     height: 30,
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 6,
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: fonts.medium,
     fontSize: typeScale.small + 1,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   content: {
     flex: 1,

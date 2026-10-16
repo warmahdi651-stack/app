@@ -12,10 +12,10 @@ import type { AppProps } from '../registry';
 type Section = 'personal' | 'system' | 'account' | 'about';
 
 const SECTIONS: { id: Section; label: string; icon: React.ComponentProps<typeof Ionicons>['name'] }[] = [
-  { id: 'personal', label: 'شخصی‌سازی', icon: 'color-palette-outline' },
-  { id: 'system', label: 'سیستم', icon: 'settings-outline' },
-  { id: 'account', label: 'حساب کاربری', icon: 'person-circle-outline' },
-  { id: 'about', label: 'درباره', icon: 'information-circle-outline' },
+  { id: 'personal', label: 'Personalization', icon: 'color-palette-outline' },
+  { id: 'system', label: 'System', icon: 'settings-outline' },
+  { id: 'account', label: 'Account', icon: 'person-circle-outline' },
+  { id: 'about', label: 'About', icon: 'information-circle-outline' },
 ];
 
 const ACCENTS = ['#4c9aff', '#0a6cff', '#7f5af0', '#e05d8c', '#f2b544', '#2fb575', '#e0523c'];
@@ -68,11 +68,11 @@ export function SettingsApp(_props: AppProps) {
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         {section === 'personal' ? (
           <>
-            <SectionTitle text="حالت نمایش" palette={palette} />
+            <SectionTitle text="Display mode" palette={palette} />
             <Row
               icon="moon-outline"
-              title="تم تیره"
-              subtitle="ظاهر ویندوز را تیره کنید"
+              title="Dark theme"
+              subtitle="Use a dark Windows appearance"
               palette={palette}
               right={
                 <Toggle
@@ -84,7 +84,7 @@ export function SettingsApp(_props: AppProps) {
             />
             <Row
               icon="time-outline"
-              title="ساعت ۲۴ ساعته"
+              title="24-hour clock"
               palette={palette}
               right={
                 <Toggle
@@ -96,7 +96,7 @@ export function SettingsApp(_props: AppProps) {
             />
             <Row
               icon="timer-outline"
-              title="نمایش ثانیه"
+              title="Show seconds"
               palette={palette}
               right={
                 <Toggle
@@ -107,7 +107,7 @@ export function SettingsApp(_props: AppProps) {
               }
             />
 
-            <SectionTitle text="پس‌زمینه" palette={palette} />
+            <SectionTitle text="Wallpaper" palette={palette} />
             <View style={styles.wallpaperGrid}>
               {wallpapers.map((wallpaper) => {
                 const active = settings.wallpaper === wallpaper.id;
@@ -137,7 +137,7 @@ export function SettingsApp(_props: AppProps) {
               })}
             </View>
 
-            <SectionTitle text="رنگ تأکیدی" palette={palette} />
+            <SectionTitle text="Accent color" palette={palette} />
             <View style={styles.accentRow}>
               {ACCENTS.map((color) => (
                 <Pressable
@@ -155,11 +155,11 @@ export function SettingsApp(_props: AppProps) {
               ))}
             </View>
 
-            <SectionTitle text="نام کاربر" palette={palette} />
+            <SectionTitle text="User name" palette={palette} />
             <Field
               value={settings.userName}
               onChangeText={(text) => updateSettings({ userName: text })}
-              placeholder="نام کاربر"
+              placeholder="User name"
               palette={palette}
               autoCapitalize="words"
             />
@@ -168,33 +168,33 @@ export function SettingsApp(_props: AppProps) {
 
         {section === 'system' ? (
           <>
-            <SectionTitle text="وضعیت سیستم" palette={palette} />
-            <Row icon="hardware-chip-outline" title="نسخه" subtitle="ویندوز ۱۱ — نسخهٔ شبیه‌سازی‌شده ۱٫۰٫۰" palette={palette} />
+            <SectionTitle text="System status" palette={palette} />
+            <Row icon="hardware-chip-outline" title="Version" subtitle={`Windows ${settings.shellVersion?.replace('win', '') ?? '11'} — Simulator 2.0.0`} palette={palette} />
             <Row
               icon="server-outline"
-              title="فضای ذخیره‌سازی"
-              subtitle={`${toPersianDigits(fileCount)} مورد — ${toPersianDigits(totalSize)} نویسه`}
+              title="Storage"
+              subtitle={`${fileCount} items — ${totalSize} characters`}
               palette={palette}
             />
             <Row
               icon="cloud-done-outline"
-              title="همگام‌سازی با سرور"
+              title="Server sync"
               subtitle={
                 auth.status === 'authenticated'
                   ? vfs.offline
-                    ? 'آفلاین — تغییرات به‌صورت محلی ذخیره می‌شود'
-                    : 'متصل — داده‌ها در PostgreSQL ذخیره می‌شوند'
-                  : 'برای فعال‌سازی، وارد حساب کاربری شوید'
+                    ? 'Offline — changes are saved locally'
+                    : 'Connected — data is synced to PostgreSQL'
+                  : 'Sign in to enable sync'
               }
               palette={palette}
             />
             <Row
               icon="trash-outline"
-              title="پاک‌سازی فایل‌های حذف‌شده"
+              title="Clean up deleted files"
               palette={palette}
               right={
                 <AppButton
-                  label="خالی کردن"
+                  label="Empty"
                   variant="ghost"
                   palette={palette}
                   onPress={() => void vfs.emptyTrash()}
@@ -203,7 +203,7 @@ export function SettingsApp(_props: AppProps) {
             />
             <View style={{ height: 14 }} />
             <AppButton
-              label="بازنشانی فایل‌های پیش‌فرض"
+              label="Restore default files"
               icon="refresh"
               palette={palette}
               variant="ghost"
@@ -214,7 +214,7 @@ export function SettingsApp(_props: AppProps) {
 
         {section === 'account' ? (
           <>
-            <SectionTitle text="حساب کاربری" palette={palette} />
+            <SectionTitle text="Account" palette={palette} />
             {auth.status === 'authenticated' && auth.user ? (
               <>
                 <Row
@@ -225,7 +225,7 @@ export function SettingsApp(_props: AppProps) {
                 />
                 <View style={{ height: 10 }} />
                 <AppButton
-                  label="خروج از حساب"
+                  label="Sign out"
                   icon="log-out-outline"
                   palette={palette}
                   variant="danger"
@@ -236,14 +236,14 @@ export function SettingsApp(_props: AppProps) {
               <>
                 <View style={styles.modeRow}>
                   <AppButton
-                    label="ورود"
+                    label="Sign in"
                     palette={palette}
                     variant={mode === 'login' ? 'primary' : 'ghost'}
                     onPress={() => setMode('login')}
                     style={styles.modeButton}
                   />
                   <AppButton
-                    label="ثبت‌نام"
+                    label="Sign up"
                     palette={palette}
                     variant={mode === 'register' ? 'primary' : 'ghost'}
                     onPress={() => setMode('register')}
@@ -255,7 +255,7 @@ export function SettingsApp(_props: AppProps) {
                     <Field
                       value={displayName}
                       onChangeText={setDisplayName}
-                      placeholder="نام نمایشی"
+                      placeholder="Display name"
                       palette={palette}
                       autoCapitalize="words"
                     />
@@ -264,14 +264,14 @@ export function SettingsApp(_props: AppProps) {
                 <Field
                   value={username}
                   onChangeText={setUsername}
-                  placeholder="نام کاربری"
+                  placeholder="Username"
                   palette={palette}
                 />
                 <View style={{ height: 8 }} />
                 <Field
                   value={password}
                   onChangeText={setPassword}
-                  placeholder="رمز عبور"
+                  placeholder="Password"
                   palette={palette}
                   secureTextEntry
                 />
@@ -280,7 +280,7 @@ export function SettingsApp(_props: AppProps) {
                 ) : null}
                 <View style={{ height: 12 }} />
                 <AppButton
-                  label={mode === 'login' ? 'ورود به حساب' : 'ساخت حساب'}
+                  label={mode === 'login' ? 'Sign in' : 'Create account'}
                   icon="log-in-outline"
                   variant="primary"
                   palette={palette}
@@ -291,7 +291,7 @@ export function SettingsApp(_props: AppProps) {
                   }}
                 />
                 <Text style={[styles.hint, { color: palette.textMuted }]}>
-                  با ورود به حساب، پنجره‌ها، فایل‌ها و تنظیمات شما روی سرور (PostgreSQL) ذخیره می‌شود.
+                  Sign in to sync your windows, files, and settings with the server (PostgreSQL).
                 </Text>
               </>
             )}
@@ -300,17 +300,17 @@ export function SettingsApp(_props: AppProps) {
 
         {section === 'about' ? (
           <>
-            <SectionTitle text="درباره" palette={palette} />
+            <SectionTitle text="About" palette={palette} />
             <View style={styles.aboutHeader}>
               <Ionicons name="logo-windows" size={38} color={palette.accent} />
-              <Text style={[styles.aboutTitle, { color: palette.text }]}>ویندوز در موبایل</Text>
+              <Text style={[styles.aboutTitle, { color: palette.text }]}>Windows in Mobile</Text>
               <Text style={[styles.aboutSubtitle, { color: palette.textMuted }]}>
-                شبیه‌ساز محیط دسکتاپ ویندوز برای گوشی — نسخهٔ ۱٫۰٫۰
+                A Windows-inspired mobile desktop — Version 2.0.0
               </Text>
             </View>
-            <Row icon="phone-portrait-outline" title="ساخته‌شده با" subtitle="React Native + Expo" palette={palette} />
-            <Row icon="server-outline" title="بک‌اند" subtitle="Fastify + PostgreSQL" palette={palette} />
-            <Row icon="language-outline" title="زبان" subtitle="فارسی — راست‌به‌چپ با تقویم هجری شمسی" palette={palette} />
+            <Row icon="phone-portrait-outline" title="Built with" subtitle="React Native + Expo" palette={palette} />
+            <Row icon="server-outline" title="Backend" subtitle="Fastify + PostgreSQL" palette={palette} />
+            <Row icon="language-outline" title="Language" subtitle="English — left-to-right" palette={palette} />
           </>
         ) : null}
       </ScrollView>
@@ -321,7 +321,7 @@ export function SettingsApp(_props: AppProps) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
   },
   sidebar: {
     width: 108,
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: StyleSheet.hairlineWidth,
   },
   navItem: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     paddingVertical: 7,
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
   navLabel: {
     fontFamily: fonts.regular,
     fontSize: typeScale.small + 1,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   content: {
     flex: 1,
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   wallpaperGrid: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
   },
@@ -383,10 +383,10 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     fontSize: typeScale.small,
     color: '#fff',
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   accentRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     gap: 10,
     paddingVertical: 6,
   },
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
     borderRadius: 13,
   },
   modeRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     gap: 8,
     marginBottom: 10,
   },
@@ -407,14 +407,14 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     fontSize: typeScale.small + 1,
     marginTop: 8,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   hint: {
     fontFamily: fonts.regular,
     fontSize: typeScale.small,
     marginTop: 10,
     lineHeight: 18,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   aboutHeader: {
     alignItems: 'center',
@@ -424,12 +424,12 @@ const styles = StyleSheet.create({
   aboutTitle: {
     fontFamily: fonts.bold,
     fontSize: typeScale.heading,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   aboutSubtitle: {
     fontFamily: fonts.regular,
     fontSize: typeScale.small,
     textAlign: 'center',
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
 });

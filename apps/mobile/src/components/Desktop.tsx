@@ -6,23 +6,23 @@ import { getApp } from '../registry';
 import { useShell } from '../state/ShellProvider';
 import { useWindows } from '../state/WindowProvider';
 import { useVfs } from '../state/VfsProvider';
-import { formatClockTime } from '../lib/fa';
-import { formatJalaliLong } from '../lib/jalali';
 import { getWallpaper, fonts, radius, typeScale } from '../theme';
 import { ContextMenu, type ContextMenuItem } from './ContextMenu';
 import { StartMenu } from './StartMenu';
 import { Taskbar } from './Taskbar';
 import { WindowFrame } from './WindowFrame';
+import { VersionLauncher } from './VersionLauncher';
 
 const DESKTOP_ICONS = [
-  { id: 'explorer', label: 'این رایانه', icon: 'desktop-outline' as const },
-  { id: 'recycle', label: 'سطل زباله', icon: 'trash-outline' as const },
-  { id: 'photos', label: 'تصاویر', icon: 'images-outline' as const },
+  { id: 'explorer', label: 'This PC', icon: 'desktop-outline' as const },
+  { id: 'recycle', label: 'Recycle Bin', icon: 'trash-outline' as const },
+  { id: 'photos', label: 'Photos', icon: 'images-outline' as const },
   { id: 'terminal', label: 'Terminal', icon: 'terminal-outline' as const },
+  { id: 'edition', label: 'Choose Windows', icon: 'logo-windows' as const },
 ];
 
 export function Desktop() {
-  const { palette, settings } = useShell();
+  const { palette, settings, updateSettings } = useShell();
   const vfs = useVfs();
   const {
     windows,
@@ -66,25 +66,25 @@ export function Desktop() {
     const items: ContextMenuItem[] = [
       {
         key: 'personalize',
-        label: 'تغییر پس‌زمینه',
+        label: 'Change wallpaper',
         icon: 'image-outline',
         onPress: () => openApp('settings'),
       },
       {
         key: 'allapps',
-        label: 'همهٔ برنامه‌ها',
+        label: 'All apps',
         icon: 'apps-outline',
         onPress: () => setStartOpen(true),
       },
       {
         key: 'restore',
-        label: 'نمایش همهٔ پنجره‌ها',
+        label: 'Show all windows',
         icon: 'desktop-outline',
         onPress: () => restoreAll(),
       },
       {
         key: 'refresh',
-        label: 'تازه‌سازی',
+        label: 'Refresh',
         icon: 'refresh-outline',
         onPress: () => setMenu(null),
       },
@@ -123,10 +123,10 @@ export function Desktop() {
 
         <View style={styles.widget} pointerEvents="none">
           <Text style={[styles.widgetTime, { color: '#fff' }]}>
-            {formatClockTime(now, settings.use24Hour)}
+            {now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: !settings.use24Hour })}
           </Text>
           <Text style={[styles.widgetDate, { color: 'rgba(255,255,255,0.85)' }]}>
-            {formatJalaliLong(now)}
+            {now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
           </Text>
         </View>
 
@@ -134,7 +134,7 @@ export function Desktop() {
           {DESKTOP_ICONS.map((icon) => (
             <Pressable
               key={icon.id}
-              onPress={() => openApp(icon.id)}
+              onPress={() => icon.id === 'edition' ? updateSettings({ shellVersion: undefined }) : openApp(icon.id)}
               onLongPress={(e) => desktopMenu(e.nativeEvent.locationX, e.nativeEvent.locationY)}
               style={({ pressed }) => [styles.desktopIcon, pressed && { opacity: 0.6 }]}
             >
@@ -185,6 +185,7 @@ export function Desktop() {
         ) : null}
 
         {menu ? <ContextMenu {...menu} palette={palette} onClose={() => setMenu(null)} /> : null}
+        {!settings.shellVersion ? <VersionLauncher /> : null}
       </View>
 
       <Taskbar
@@ -215,12 +216,12 @@ const styles = StyleSheet.create({
   widgetTime: {
     fontFamily: fonts.bold,
     fontSize: typeScale.heading,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   widgetDate: {
     fontFamily: fonts.regular,
     fontSize: typeScale.small,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   iconColumn: {
     position: 'absolute',
@@ -240,6 +241,6 @@ const styles = StyleSheet.create({
     fontSize: typeScale.caption + 1,
     color: '#fff',
     textAlign: 'center',
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
 });

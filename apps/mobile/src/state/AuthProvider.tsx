@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setState({ status: 'authenticated', user: res.user, token: res.token, error: null, busy: false });
       return true;
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'ورود ناموفق بود.';
+      const message = error instanceof Error ? error.message : 'Sign in failed.';
       setState((prev) => ({ ...prev, busy: false, error: message }));
       return false;
     }
@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setState({ status: 'authenticated', user: res.user, token: res.token, error: null, busy: false });
       return true;
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'ثبت‌نام ناموفق بود.';
+      const message = error instanceof Error ? error.message : 'Sign up failed.';
       setState((prev) => ({ ...prev, busy: false, error: message }));
       return false;
     }
@@ -110,6 +110,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth باید داخل AuthProvider استفاده شود.');
+  if (!ctx) throw new Error('useAuth must be used inside AuthProvider.');
   return ctx;
 }

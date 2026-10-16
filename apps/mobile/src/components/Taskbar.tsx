@@ -1,8 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { formatClock, formatClockWithSeconds } from '../lib/fa';
-import { formatJalaliNumeric } from '../lib/jalali';
 import { useShell } from '../state/ShellProvider';
 import { useWindows } from '../state/WindowProvider';
 import { fonts, radius, typeScale } from '../theme';
@@ -106,11 +104,9 @@ export function Taskbar({
         <Ionicons name="battery-half" size={13} color={palette.text} />
         <View style={styles.clockBox}>
           <Text style={[styles.clock, { color: palette.text }]}>
-            {settings.showSeconds
-              ? formatClockWithSeconds(now, settings.use24Hour)
-              : formatClock(now, settings.use24Hour)}
+            {now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', ...(settings.showSeconds ? { second: '2-digit' as const } : {}), hour12: !settings.use24Hour })}
           </Text>
-          <Text style={[styles.date, { color: palette.text }]}>{formatJalaliNumeric(now)}</Text>
+          <Text style={[styles.date, { color: palette.text }]}>{now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}</Text>
         </View>
       </View>
     </View>
@@ -119,7 +115,7 @@ export function Taskbar({
 
 const styles = StyleSheet.create({
   taskbar: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 6,
     paddingVertical: 4,
@@ -141,7 +137,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   taskButtons: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
     flex: 1,
@@ -162,7 +158,7 @@ const styles = StyleSheet.create({
     borderRadius: 1,
   },
   tray: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     paddingHorizontal: 6,
@@ -174,11 +170,11 @@ const styles = StyleSheet.create({
   clock: {
     fontFamily: fonts.medium,
     fontSize: typeScale.small + 1,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   date: {
     fontFamily: fonts.regular,
     fontSize: typeScale.caption + 1,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
 });

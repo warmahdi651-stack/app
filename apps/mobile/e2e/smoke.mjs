@@ -34,7 +34,7 @@ if (!existsSync(distIndex)) {
   process.exit(1);
 }
 
-console.log('در حال بالا آوردن سرور…');
+console.log('Starting API server…');
 const server = spawn('npx', ['tsx', 'src/index.ts'], {
   cwd: serverRoot,
   env: {
@@ -130,56 +130,61 @@ const click = (el) => {
 try {
   await wait(4000);
 
-  check('دسکتاپ رندر شد', bodyText().includes('این رایانه') && bodyText().includes('Terminal'));
+  check('English edition launcher displayed', bodyText().includes('Choose your Windows'));
+  check('All four Windows editions listed', ['Windows 7', 'Windows 8', 'Windows 10', 'Windows 11'].every((edition) => bodyText().includes(edition)));
+  click(byText('Windows 11'));
+  await wait(900);
+
+  check('desktop rendered in English', bodyText().includes('This PC') && bodyText().includes('Terminal'));
 
   // کاراکتر آیکون دکمهٔ استارت را در همان ابتدا ذخیره می‌کنیم تا بعداً قابل شناسایی باشد
   const startGlyph = (buttons().find((el) => (el.textContent ?? '').trim().length === 1)?.textContent ?? '').trim();
   const startButton = () => buttons().find((el) => (el.textContent ?? '').trim() === startGlyph);
-  check('ویجت ساعت و تاریخ شمسی', /[۰-۹]{2}:[۰-۹]{2}/.test(bodyText()) && bodyText().includes('مهر'));
+  check('English clock and date rendered', /[0-9]{2}:[0-9]{2}/.test(bodyText()) && bodyText().includes('202'));
 
   // دکمهٔ استارت: اولین دکمهٔ تک‌نویسه‌ای (آیکون) در نوار وظیفه
   const glyphButtons = buttons().filter((el) => (el.textContent ?? '').trim().length === 1);
   click(glyphButtons[0]);
   await wait(900);
   check(
-    'منوی استارت باز شد',
-    bodyText().includes('پیوست‌شده‌ها') && bodyText().includes('برنامه‌های سیستم'),
+    'Start menu opened',
+    bodyText().includes('Pinned') && bodyText().includes('System apps'),
   );
 
   // باز کردن ماشین‌حساب از منوی استارت
-  click(byText('ماشین‌حساب'));
+  click(byText('Calculator'));
   await wait(1200);
-  check('ماشین‌حساب از منوی استارت باز شد', bodyText().includes('CE') && bodyText().includes('√x'));
+  check('Calculator opened from Start menu', bodyText().includes('CE') && bodyText().includes('√x'));
 
-  click(byText('این رایانه'));
+  click(byText('This PC'));
   await wait(1200);
-  check('پنجرهٔ مدیر فایل باز شد', bodyText().includes('مدیر فایل'));
-  check('نوار آدرس دیسک C نمایش داده شد', bodyText().includes('C:'));
-  check('پوشه‌های پیش‌فرض دیده می‌شوند', bodyText().includes('Users') && bodyText().includes('Program Files'));
+  check('File Explorer window opened', bodyText().includes('File Explorer'));
+  check('C drive address shown', bodyText().includes('C:'));
+  check('Default folders are visible', bodyText().includes('Users') && bodyText().includes('Program Files'));
 
   click(byText('Users'));
   await wait(700);
-  check('پیمایش به پوشهٔ کاربر', bodyText().includes('Karim'));
+  check('Navigated to user folder', bodyText().includes('Karim'));
 
   click(byText('Karim'));
   await wait(700);
-  check('ورود به پوشهٔ کاربر', bodyText().includes('Documents') && bodyText().includes('Pictures'));
+  check('User folders are visible', bodyText().includes('Documents') && bodyText().includes('Pictures'));
 
   click(byText('Documents'));
   await wait(700);
-  check('پوشهٔ اسناد باز شد', bodyText().includes('خوش‌آمدید'));
+  check('Documents folder opened', bodyText().includes('Welcome'));
 
-  click(byText('خوش‌آمدید'));
+  click(byText('Welcome.txt'));
   await wait(1500);
-  check('فایل متنی در Notepad باز شد', bodyText().includes('به شبیه‌ساز ویندوز خوش آمدید'));
-  check('نوار وضعیت Notepad', bodyText().includes('نویسه') && bodyText().includes('سطر'));
+  check('Welcome text file opened in Notepad', bodyText().includes('Welcome to the Windows simulator'));
+  check('Notepad status bar is visible', bodyText().includes('characters') && bodyText().includes('Column'));
 
   // ── ترمینال: تایپ دستور و اجرای آن ──────────────────────────────
   click(startButton());
   await wait(800);
   click(byText('Terminal'));
   await wait(1200);
-  check('ترمینال باز شد', bodyText().includes('Windows Terminal'));
+  check('Terminal opened', bodyText().includes('Windows Terminal'));
 
   const typeInto = async (value) => {
     // آخرین ورودی صفحه متعلق به ترمینال است (پنجرهٔ آخر بازشده)
@@ -200,13 +205,13 @@ try {
   };
 
   await typeInto('help');
-  check('دستور help اجرا شد', bodyText().includes('دستورهای موجود'));
+  check('help command executed', bodyText().includes('Available commands'));
   await typeInto('dir');
-  check('دستور dir فهرست فایل‌ها را نشان داد', bodyText().includes('Directory of'));
+  check('dir command lists files', bodyText().includes('Directory of'));
   await typeInto('exit');
-  check('دستور exit پنجره را بست', !bodyText().includes('دستورهای موجود'));
+  check('exit command closed terminal', !bodyText().includes('Available commands'));
 
-  check('بدون خطای اجرا', errors.length === 0, errors.slice(0, 2).join(' | '));
+  check('No runtime errors', errors.length === 0, errors.slice(0, 2).join(' | '));
 } finally {
   dom.window.close();
   cleanup();

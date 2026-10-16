@@ -2,9 +2,10 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 import { api } from '../api/client';
 import { readStorage, removeStorage, uid, writeStorage } from '../lib/storage';
 import { useAuth } from './AuthProvider';
+import { useShell } from './ShellProvider';
 import type { VfsNode } from './types';
 
-const STORAGE_KEY = 'wim.fs.v1';
+const storageKeyFor = (version: string | undefined) => `wim.fs.v2.${version ?? 'win11'}`;
 
 type SeedNode = { name: string; kind: 'file' | 'folder'; content?: string; children?: SeedNode[] };
 
@@ -26,30 +27,30 @@ const DEFAULT_TREE: SeedNode = {
               kind: 'folder',
               children: [
                 {
-                  name: 'خوش‌آمدید.txt',
+                  name: 'Welcome.txt',
                   kind: 'file',
                   content:
-                    'به شبیه‌ساز ویندوز خوش آمدید!\n\nاین یک دسکتاپ کوچک داخل گوشی شماست.\n\n• از نوار پایین، برنامه‌ها را باز کنید.\n' +
-                    '• پنجره‌ها را با کشیدن نوار بالایی جابه‌جا کنید.\n' +
-                    '• از گوشهٔ پایین پنجره، اندازه را تغییر دهید.\n' +
-                    '• فایل‌های شما روی سرور (PostgreSQL) ذخیره می‌شوند.',
+                    'Welcome to the Windows simulator!\n\nThis is a compact desktop on your phone.\n\n• Open apps from the taskbar.\n' +
+                    '• Drag the title bar to move windows.\n' +
+                    '• Resize a window from its bottom corner.\n' +
+                    '• Your files can sync to a server (PostgreSQL).',
                 },
                 {
-                  name: 'نوت‌ها.md',
+                  name: 'Notes.md',
                   kind: 'file',
-                  content: '# نوت‌ها\n\n- این فایل در پوشهٔ Documents قرار دارد.\n- هر تغییری که در Notepad بدهید ذخیره می‌شود.\n',
+                  content: '# Notes\n\n- This file is in the Documents folder.\n- Changes made in Notepad are saved.\n',
                 },
               ],
             },
             {
               name: 'Desktop',
               kind: 'folder',
-              children: [{ name: 'چندتا کار.txt', kind: 'file', content: 'یک فهرست کارهای ساده\n' }],
+              children: [{ name: 'Todo.txt', kind: 'file', content: 'A simple to-do list\n' }],
             },
             {
               name: 'Pictures',
               kind: 'folder',
-              children: [{ name: 'منظره.txt', kind: 'file', content: 'تصویر نمونهٔ منظره' }],
+              children: [{ name: 'Landscape.txt', kind: 'file', content: 'Sample landscape image' }],
             },
             { name: 'Downloads', kind: 'folder', children: [] },
             { name: 'Music', kind: 'folder', children: [] },
@@ -131,6 +132,11 @@ const VfsContext = createContext<VfsContextValue | null>(null);
 
 export function VfsProvider({ children }: { children: React.ReactNode }) {
   const { status } = useAuth();
+  const { settings } = useShell();
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
+  const diskKey = storageKeyFor(settings.shellVersion);
+  const [activeDiskKey, setActiveDiskKey] = useState(diskKey);
   const [nodes, setNodes] = useState<VfsNode[]>([]);
   const [ready, setReady] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -139,24 +145,25 @@ export function VfsProvider({ children }: { children: React.ReactNode }) {
   nodesRef.current = nodes;
 
   useEffect(() => {
+    let cancelled = false;
+    setReady(false);
     (async () => {
-      const saved = await readStorage<VfsNode[]>(STORAGE_KEY, []);
-      if (saved.length) {
-        setNodes(saved);
-      } else {
-        const seeded = buildFlat(DEFAULT_TREE, null);
-        setNodes(seeded);
-        await writeStorage(STORAGE_KEY, seeded);
-      }
+      const saved = await readStorage<VfsNode[]>(diskKey, []);
+      const data = saved.length ? saved : buildFlat(DEFAULT_TREE, null);
+      if (cancelled) return;
+      setNodes(data);
+      setActiveDiskKey(diskKey);
+      if (!saved.length) await writeStorage(diskKey, data);
       setReady(true);
     })();
-  }, []);
+    return () => { cancelled = true; };
+  }, [diskKey]);
 
   useEffect(() => {
-    if (ready) void writeStorage(STORAGE_KEY, nodes);
-  }, [nodes, ready]);
+    if (ready && activeDiskKey === diskKey) void writeStorage(activeDiskKey, nodes);
+  }, [nodes, ready, activeDiskKey, diskKey]);
 
-  /** همگام‌سازی با سرور پس از ورود */
+  /** Server sync پس از Sign in */
   useEffect(() => {
     if (status !== 'authenticated') return;
     let cancelled = false;
@@ -166,9 +173,16 @@ export function VfsProvider({ children }: { children: React.ReactNode }) {
         const res = await api.get<{ tree: ServerNode[] }>('/api/fs/tree');
         if (cancelled) return;
         if (res.tree.length) {
-          const flat = flatten(res.tree);
-          setNodes(flat);
-          await writeStorage(STORAGE_KEY, flat);
+          const diskName = `C: [${(settings.shellVersion ?? 'win11').toUpperCase()}]`;
+          const currentDisk = res.tree.filter((root) => root.name === diskName);
+          if (currentDisk.length) {
+            const flat = flatten(currentDisk);
+            if (flat[0]) flat[0].name = 'C:';
+            setNodes(flat);
+            await writeStorage(diskKey, flat);
+          } else {
+            await seedRemote();
+          }
         } else {
           await seedRemote();
         }
@@ -196,7 +210,7 @@ export function VfsProvider({ children }: { children: React.ReactNode }) {
         if (node.kind === 'folder') {
           const res = await api.post<{ node: { id: string } }>('/api/fs/folders', {
             parentId: parentRemoteId,
-            name: node.name,
+            name: parentRemoteId === null ? `C: [${(settingsRef.current.shellVersion ?? 'win11').toUpperCase()}]` : node.name,
           });
           return res.node.id;
         }
@@ -474,7 +488,7 @@ export function VfsProvider({ children }: { children: React.ReactNode }) {
   const resetToDefault = useCallback(async () => {
     const seeded = buildFlat(DEFAULT_TREE, null);
     setNodes(seeded);
-    await writeStorage(STORAGE_KEY, seeded);
+    await writeStorage(diskKey, seeded);
     if (api.getToken()) {
       const res = await api.get<{ trash: ServerNode[] }>('/api/fs/trash').catch(() => ({ trash: [] }));
       for (const item of res.trash) {
@@ -536,7 +550,7 @@ export function VfsProvider({ children }: { children: React.ReactNode }) {
 
 export function useVfs(): VfsContextValue {
   const ctx = useContext(VfsContext);
-  if (!ctx) throw new Error('useVfs باید داخل VfsProvider استفاده شود.');
+  if (!ctx) throw new Error('useVfs must be used inside VfsProvider.');
   return ctx;
 }
 

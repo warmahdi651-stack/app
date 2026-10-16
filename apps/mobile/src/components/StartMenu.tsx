@@ -54,7 +54,7 @@ export function StartMenu({
         <Field
           value={query}
           onChangeText={setQuery}
-          placeholder="جست‌وجوی برنامه‌ها..."
+          placeholder="Search apps..."
           palette={palette}
         />
       </View>
@@ -71,10 +71,10 @@ export function StartMenu({
         </View>
         <View style={styles.accountText}>
           <Text style={[styles.accountName, { color: palette.text }]}>
-            {auth.user?.displayName ?? 'کاربر مهمان'}
+            {auth.user?.displayName ?? 'Guest user'}
           </Text>
           <Text style={[styles.accountStatus, { color: palette.textMuted }]}>
-            {auth.status === 'authenticated' ? 'وارد شده — همگام با سرور' : 'حساب مهمان — داده‌ها محلی ذخیره می‌شود'}
+            {auth.status === 'authenticated' ? 'Signed in — synced' : 'Guest account — data is stored locally'}
           </Text>
         </View>
         <Ionicons name="chevron-back" size={14} color={palette.textMuted} />
@@ -83,9 +83,9 @@ export function StartMenu({
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {query.trim() ? (
           <>
-            <Text style={[styles.groupTitle, { color: palette.textMuted }]}>نتایج</Text>
+            <Text style={[styles.groupTitle, { color: palette.textMuted }]}>Results</Text>
             {filtered.length === 0 ? (
-              <Text style={[styles.noResult, { color: palette.textMuted }]}>برنامه‌ای پیدا نشد.</Text>
+              <Text style={[styles.noResult, { color: palette.textMuted }]}>No apps found.</Text>
             ) : (
               <View style={styles.pinnedGrid}>
                 {filtered.map((app) => (
@@ -96,7 +96,7 @@ export function StartMenu({
           </>
         ) : (
           <>
-            <Text style={[styles.groupTitle, { color: palette.textMuted }]}>پیوست‌شده‌ها</Text>
+            <Text style={[styles.groupTitle, { color: palette.textMuted }]}>Pinned</Text>
             <View style={styles.pinnedGrid}>
               {APPS.slice(0, 8).map((app) => (
                 <AppTile key={app.id} app={app} palette={palette} onPress={() => onOpenApp(app.id)} />
@@ -137,7 +137,7 @@ export function StartMenu({
           <View style={[styles.powerMenu, { backgroundColor: palette.surface, borderColor: palette.border }]}>
             <PowerItem
               icon="log-out-outline"
-              label="خروج از حساب"
+              label="Sign out"
               palette={palette}
               onPress={() => {
                 void auth.logout();
@@ -146,7 +146,7 @@ export function StartMenu({
             />
             <PowerItem
               icon="desktop-outline"
-              label="نمایش همهٔ پنجره‌ها"
+              label="Show all windows"
               palette={palette}
               onPress={() => {
                 setPowerOpen(false);
@@ -155,7 +155,7 @@ export function StartMenu({
             />
             <PowerItem
               icon="settings-outline"
-              label="تنظیمات"
+              label="Settings"
               palette={palette}
               onPress={() => {
                 setPowerOpen(false);
@@ -164,7 +164,7 @@ export function StartMenu({
             />
           </View>
         ) : null}
-        <Text style={[styles.footerText, { color: palette.textMuted }]}>ویندوز در موبایل</Text>
+        <Text style={[styles.footerText, { color: palette.textMuted }]}>Windows in Mobile</Text>
       </View>
     </View>
   );
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   account: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     padding: 6,
@@ -258,12 +258,12 @@ const styles = StyleSheet.create({
   accountName: {
     fontFamily: fonts.medium,
     fontSize: typeScale.body,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   accountStatus: {
     fontFamily: fonts.regular,
     fontSize: typeScale.caption + 1,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   scroll: {
     marginTop: 4,
@@ -277,10 +277,10 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     marginTop: 8,
     marginBottom: 6,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   pinnedGrid: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 4,
   },
@@ -301,11 +301,11 @@ const styles = StyleSheet.create({
   tileLabel: {
     fontFamily: fonts.regular,
     fontSize: typeScale.caption + 1,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
     textAlign: 'center',
   },
   appRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     paddingVertical: 6,
@@ -322,15 +322,15 @@ const styles = StyleSheet.create({
   appRowText: {
     fontFamily: fonts.regular,
     fontSize: typeScale.body,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   noResult: {
     fontFamily: fonts.regular,
     fontSize: typeScale.small + 1,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   footer: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     borderTopWidth: StyleSheet.hairlineWidth,
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
   footerText: {
     fontFamily: fonts.regular,
     fontSize: typeScale.caption + 1,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   powerMenu: {
     position: 'absolute',
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   powerItem: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     paddingVertical: 7,
@@ -368,6 +368,6 @@ const styles = StyleSheet.create({
   powerItemText: {
     fontFamily: fonts.regular,
     fontSize: typeScale.body,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
 });

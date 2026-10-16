@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     fontFamily: fonts.regular,
     fontSize: typeScale.body,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   empty: {
     flex: 1,
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
     marginBottom: 6,
     marginTop: 10,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   row: {
     flexDirection: 'row',
@@ -321,12 +321,12 @@ const styles = StyleSheet.create({
   rowTitle: {
     fontFamily: fonts.regular,
     fontSize: typeScale.body,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   rowSubtitle: {
     fontFamily: fonts.regular,
     fontSize: typeScale.small,
-    writingDirection: 'rtl',
+    writingDirection: 'ltr',
   },
   toggle: {
     width: 40,

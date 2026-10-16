@@ -31,7 +31,7 @@ export function NotepadApp({ props, windowId }: AppProps) {
       setWindowTitle(windowId, `${file.name} — Notepad`);
     } else {
       setContent('');
-      setWindowTitle(windowId, 'Notepad — سند بدون‌نام');
+      setWindowTitle(windowId, 'Notepad — Untitled document');
     }
   }, [file, fileId, setWindowTitle, windowId]);
 
@@ -45,38 +45,38 @@ export function NotepadApp({ props, windowId }: AppProps) {
 
   const save = async () => {
     if (!fileId) {
-      setDialog({ mode: 'saveAs', value: 'سند.txt' });
+      setDialog({ mode: 'saveAs', value: 'Document.txt' });
       return;
     }
     await vfs.updateFile(fileId, content);
     setDirty(false);
-    setStatus('ذخیره شد');
+    setStatus('Saved');
     setTimeout(() => setStatus(''), 1600);
   };
 
   return (
     <View style={[styles.root, { backgroundColor: palette.surface }]}>
       <View style={[styles.menuBar, { borderBottomColor: palette.border, backgroundColor: palette.surfaceAlt }]}>
-        <MenuItem label="فایل" palette={palette} onPress={() => setDialog({ mode: 'saveAs', value: file?.name ?? 'سند.txt' })} />
+        <MenuItem label="File" palette={palette} onPress={() => setDialog({ mode: 'saveAs', value: file?.name ?? 'Document.txt' })} />
         <MenuItem
-          label="ویرایش"
+          label="Edit"
           palette={palette}
           onPress={() => setContent((c) => c + '\n')}
         />
         <MenuItem
-          label="قالب"
+          label="Format"
           palette={palette}
           onPress={() => setWrap((w) => !w)}
           active={wrap}
         />
         <View style={{ flex: 1 }} />
-        {dirty ? <Text style={[styles.dirty, { color: palette.warning }]}>تغییرات ذخیره‌نشده</Text> : null}
+        {dirty ? <Text style={[styles.dirty, { color: palette.warning }]}>Unsaved changes</Text> : null}
         <Pressable
           onPress={save}
           style={({ pressed }) => [styles.saveButton, { backgroundColor: palette.accent, opacity: pressed ? 0.8 : 1 }]}
         >
           <Ionicons name="save-outline" size={13} color={palette.textOnAccent} />
-          <Text style={[styles.saveText, { color: palette.textOnAccent }]}>ذخیره</Text>
+          <Text style={[styles.saveText, { color: palette.textOnAccent }]}>Save</Text>
         </Pressable>
       </View>
 
@@ -93,8 +93,8 @@ export function NotepadApp({ props, windowId }: AppProps) {
           {
             color: palette.text,
             backgroundColor: palette.inputBg,
-            textAlign: 'right',
-            writingDirection: 'rtl',
+            textAlign: 'left',
+            writingDirection: 'ltr',
           },
           wrap ? undefined : { height: 220 },
         ]}
@@ -102,13 +102,13 @@ export function NotepadApp({ props, windowId }: AppProps) {
 
       <View style={[styles.statusBar, { borderTopColor: palette.border, backgroundColor: palette.surfaceAlt }]}>
         <Text style={[styles.statusText, { color: palette.textMuted }]}>
-          سطر {toPersianDigits(stats.line)}، ستون {toPersianDigits(stats.column)}
+          Line {stats.line}, Column {stats.column}
         </Text>
         <Text style={[styles.statusText, { color: palette.textMuted }]}>
-          {toPersianDigits(stats.chars)} نویسه
+          {String(stats.chars)} characters
         </Text>
         <Text style={[styles.statusText, { color: palette.textMuted }]}>
-          {toPersianDigits(stats.words)} واژه
+          {stats.words} words
         </Text>
         <View style={{ flex: 1 }} />
         {status ? <Text style={[styles.statusText, { color: palette.success }]}>{status}</Text> : null}
@@ -116,15 +116,15 @@ export function NotepadApp({ props, windowId }: AppProps) {
 
       <Dialog
         visible={dialog !== null}
-        title={dialog?.mode === 'rename' ? 'تغییر نام فایل' : 'ذخیره به‌عنوان'}
+        title={dialog?.mode === 'rename' ? 'Rename file' : 'Save as'}
         palette={palette}
         inputValue={dialog?.value ?? ''}
         onChangeInput={(text) => setDialog((d) => (d ? { ...d, value: text } : d))}
-        inputPlaceholder="نام فایل"
+        inputPlaceholder="File name"
         onCancel={() => setDialog(null)}
         onConfirm={async () => {
           if (!dialog) return;
-          const name = dialog.value.trim() || 'سند.txt';
+          const name = dialog.value.trim() || 'Document.txt';
           if (fileId) {
             await vfs.rename(fileId, name);
             await vfs.updateFile(fileId, content);
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menuBar: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
     paddingHorizontal: 6,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 6,
   },
   saveButton: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     paddingHorizontal: 10,
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   statusBar: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
     paddingHorizontal: 10,

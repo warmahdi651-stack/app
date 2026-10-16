@@ -9,8 +9,6 @@ import {
   type ScrollViewInstance,
   type TextInputInstance,
 } from 'react-native';
-import { formatJalali } from '../lib/jalali';
-import { toPersianDigits } from '../lib/fa';
 import { useShell } from '../state/ShellProvider';
 import { useVfs } from '../state/VfsProvider';
 import { useWindows } from '../state/WindowProvider';
@@ -62,8 +60,8 @@ export function TerminalApp({ windowId }: AppProps) {
 
   useEffect(() => {
     if (vfs.root) {
-      push('Windows Terminal — شبیه‌ساز ویندوز', 'accent');
-      push('برای دیدن فهرست دستورها «help» را بنویسید.', 'muted');
+      push('Windows Terminal', 'accent');
+      push('Type “help” to see the list of commands.', 'muted');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vfs.root?.id]);
@@ -100,34 +98,34 @@ export function TerminalApp({ windowId }: AppProps) {
 
     switch (command.toLowerCase()) {
       case 'help': {
-        push('دستورهای موجود:');
-        push('  dir | ls            نمایش محتوای پوشهٔ جاری');
-        push('  cd <مسیر>           تغییر پوشهٔ جاری');
-        push('  cat | type <فایل>   نمایش محتوای فایل');
-        push('  echo <متن>          چاپ متن');
-        push('  mkdir <نام>         ساخت پوشه');
-        push('  touch <نام>         ساخت فایل');
-        push('  del | rm <نام>      انتقال به سطل زباله');
-        push('  tree                نمای درخت پوشه‌ها');
-        push('  start <برنامه>      اجرای برنامه');
+        push('Available commands:');
+        push('  dir | ls            List current folder contents');
+        push('  cd <path>            Change current folder');
+        push('  cat | type <File>   Print file contents');
+        push('  echo <Text>          Print text');
+        push('  mkdir <Name>         Create folder');
+        push('  touch <Name>         Create file');
+        push('  del | rm <Name>      Move to Recycle Bin');
+        push('  tree                Show folder tree');
+        push('  start <app>           Launch app');
         push('  whoami | ver | date | time');
-        push('  neofetch            اطلاعات سیستم');
-        push('  cls | clear         پاک کردن صفحه');
-        push('  exit                بستن ترمینال');
+        push('  neofetch            System information');
+        push('  cls | clear         Clear screen');
+        push('  exit                Close terminal');
         break;
       }
       case 'dir':
       case 'ls': {
         const children = vfs.childrenOf(currentDir?.id ?? null);
         if (!children.length) {
-          push('پوشه خالی است.', 'muted');
+          push('Folder is empty.', 'muted');
           break;
         }
         push('  Volume in drive C   Directory of ' + (cwd ? vfs.pathOf(cwd) : 'C:'));
         for (const child of children) {
           const date = new Date(child.updatedAt);
           push(
-            `${child.kind === 'folder' ? '<DIR>       ' : toPersianDigits(child.content.length).padStart(8)}  ${date.toLocaleDateString('fa-IR')}   ${child.name}`,
+            `${child.kind === 'folder' ? '<DIR>       ' : String(child.content.length).padStart(8)}  ${date.toLocaleDateString('en-US')}   ${child.name}`,
           );
         }
         break;
@@ -140,11 +138,11 @@ export function TerminalApp({ windowId }: AppProps) {
         const { nodeId } = resolvePath(arg);
         const node = nodeId ? vfs.nodeById(nodeId) : undefined;
         if (!node) {
-          push(`مسیر «${arg}» یافت نشد.`, 'error');
+          push(`Path “${arg}” was not found.`, 'error');
           break;
         }
         if (node.kind !== 'folder') {
-          push('مسیر باید یک پوشه باشد.', 'error');
+          push('Path must be a folder.', 'error');
           break;
         }
         setCwd(node.id);
@@ -155,14 +153,14 @@ export function TerminalApp({ windowId }: AppProps) {
         const { nodeId } = resolvePath(arg);
         const node = nodeId ? vfs.nodeById(nodeId) : undefined;
         if (!node) {
-          push(`فایل «${arg}» یافت نشد.`, 'error');
+          push(`File “${arg}” was not found.`, 'error');
           break;
         }
         if (node.kind === 'folder') {
-          push('این یک پوشه است.', 'error');
+          push('This is a folder.', 'error');
           break;
         }
-        push(node.content || '(فایل خالی است)', 'muted');
+        push(node.content || '(File is empty)', 'muted');
         break;
       }
       case 'echo':
@@ -170,20 +168,20 @@ export function TerminalApp({ windowId }: AppProps) {
         break;
       case 'mkdir': {
         if (!arg) {
-          push('نام پوشه را وارد کنید.', 'error');
+          push('Enter a folder name.', 'error');
           break;
         }
         await vfs.createFolder(currentDir?.id ?? null, arg);
-        push(`پوشهٔ «${arg}» ساخته شد.`);
+        push(`Folder “${arg}” created.`);
         break;
       }
       case 'touch': {
         if (!arg) {
-          push('نام فایل را وارد کنید.', 'error');
+          push('Enter a file name.', 'error');
           break;
         }
         await vfs.createFile(currentDir?.id ?? null, arg, '');
-        push(`فایل «${arg}» ساخته شد.`);
+        push(`File “${arg}” created.`);
         break;
       }
       case 'del':
@@ -191,11 +189,11 @@ export function TerminalApp({ windowId }: AppProps) {
         const { nodeId } = resolvePath(arg);
         const node = nodeId ? vfs.nodeById(nodeId) : undefined;
         if (!node) {
-          push(`«${arg}» یافت نشد.`, 'error');
+          push(`“${arg}” was not found.`, 'error');
           break;
         }
         await vfs.trash(node.id);
-        push(`«${node.name}» به سطل زباله منتقل شد.`);
+        push(`“${node.name}” moved to Recycle Bin.`);
         break;
       }
       case 'tree': {
@@ -214,24 +212,24 @@ export function TerminalApp({ windowId }: AppProps) {
       case 'start': {
         const appId = APP_ALIASES[arg.toLowerCase()];
         if (!appId) {
-          push(`برنامهٔ «${arg}» شناخته نشد.`, 'error');
+          push(`App “${arg}” was not recognized.`, 'error');
           break;
         }
-        openWindow({ appId, title: 'در حال اجرا...', singleton: false });
-        push(`برنامهٔ «${arg}» اجرا شد.`);
+        openWindow({ appId, title: 'Launching...', singleton: false });
+        push(`App “${arg}” launched.`);
         break;
       }
       case 'whoami':
         push(settings.userName || 'user');
         break;
       case 'ver':
-        push('Windows 11 Pro [نسخهٔ شبیه‌سازی‌شده — نسخهٔ ۱٫۰٫۰]');
+        push(`Windows ${settings.shellVersion?.replace('win', '') ?? '11'} [Simulator 2.0.0]`);
         break;
       case 'date':
-        push(formatJalali(new Date()));
+        push(new Date().toLocaleDateString('en-US'));
         break;
       case 'time':
-        push(new Date().toLocaleTimeString('fa-IR'));
+        push(new Date().toLocaleTimeString('en-US'));
         break;
       case 'neofetch': {
         push('  ▄▄▄▄▄▄▄▄▄▄▄▄', 'accent');
@@ -243,10 +241,10 @@ export function TerminalApp({ windowId }: AppProps) {
         push('  █ ▀▀▀▀▀▀▀▀▀ █ ▀▀▀▀▀▀▀▀▀ █', 'accent');
         push('  ▀▀▀▀▀▀▀▀▀▀▀ ▀▀▀▀▀▀▀▀▀▀▀ ▀', 'accent');
         push('');
-        push(`  کاربر: ${settings.userName || 'user'}`);
-        push('  سیستم‌عامل: Windows 11 (شبیه‌سازی‌شده)');
-        push(`  پوسته: نسخهٔ ۱٫۰٫۰ — React Native`);
-        push(`  تاریخ: ${formatJalali(new Date())}`);
+        push(`  User: ${settings.userName || 'user'}`);
+        push(`  OS: Windows ${settings.shellVersion?.replace('win', '') ?? '11'} (simulated)`);
+        push(`  Shell: Version 2.0.0 — React Native`);
+        push(`  Date: ${new Date().toLocaleDateString('en-US')}`);
         break;
       }
       case 'cls':
@@ -257,7 +255,7 @@ export function TerminalApp({ windowId }: AppProps) {
         closeWindow(windowId);
         break;
       default:
-        push(`'${command}' شناخته نشد. برای راهنما «help» را بنویسید.`, 'error');
+        push(`'${command}' is not recognized. Type 'help' for assistance.`, 'error');
     }
   };
 

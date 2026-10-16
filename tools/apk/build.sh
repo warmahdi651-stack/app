@@ -120,4 +120,8 @@ log "بررسی نهایی"
 echo
 ls -la "$FINAL"
 echo
-echo "✅ APK آماده است: $FINAL"
+DOWNLOAD_APK="$ROOT/apps/mobile/dist/Windows-in-Mobile-v2.0.0.apk"
+mkdir -p "$(dirname "$DOWNLOAD_APK")"
+cp "$FINAL" "$DOWNLOAD_APK"
+echo "✅ APK ready: $FINAL"
+echo "📥 Download copy: $DOWNLOAD_APK ($(wc -c < "$DOWNLOAD_APK") bytes)"
