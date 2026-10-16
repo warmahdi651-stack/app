@@ -160,8 +160,8 @@ EXPO_PUBLIC_API_URL=http://192.168.1.20:4000 npm --prefix apps/mobile run start
 | لینک | توضیح |
 |---|---|
 | `https://warmahdi651-stack.github.io/app/windows-simulator.apk` | از سایت منتشرشده (پیشنهادی) |
-| `https://github.com/warmahdi651-stack/app/raw/main/releases/windows-simulator.apk` | از مخزن گیت‌هاب |
-| `https://cdn.jsdelivr.net/gh/warmahdi651-stack/app@main/releases/windows-simulator.apk` | از CDN |
+| `https://github.com/warmahdi651-stack/app/raw/arena/1db484ac-app/releases/Windows-in-Mobile-v2.0.0.apk` | از مخزن گیت‌هاب |
+| `https://cdn.jsdelivr.net/gh/warmahdi651-stack/app@arena/1db484ac-app/releases/Windows-in-Mobile-v2.0.0.apk` | از CDN |
 
 - پکیج: `com.arena.windowsinmobile` — امضای v1 + v2 + v3 — اندروید ۵ به بالا — حدود ۳٫۳ مگابایت
 - پس از دانلود، در تنظیمات گوشی به فایل‌منیجر اجازهٔ **«نصب از منابع ناشناس»** بدهید.
