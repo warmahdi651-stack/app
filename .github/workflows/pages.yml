@@ -1,0 +1,44 @@
+name: انتشار نسخهٔ وب در GitHub Pages
+
+on:
+  push:
+    branches: [main, arena/b6003a9f-app]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ساخت و انتشار نسخهٔ وب
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/mobile/package-lock.json
+
+      - name: نصب وابستگی‌ها
+        run: npm ci
+        working-directory: apps/mobile
+
+      - name: ساخت خروجی وب
+        run: npx expo export --platform web --output-dir dist --clear
+        working-directory: apps/mobile
+
+      - name: حذف فونت‌های بلااستفاده (فقط Ionicons لازم است)
+        run: find dist -name '*.ttf' ! -name 'Ionicons*' -delete
+        working-directory: apps/mobile
+
+      - name: انتشار روی شاخهٔ gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apps/mobile/dist
+          publish_branch: gh-pages
+          user_name: arena-agent
+          user_email: agent@arena.ai
+          commit_message: 'build: انتشار نسخهٔ وب ({#})'

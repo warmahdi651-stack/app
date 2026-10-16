@@ -1,0 +1,16 @@
+{
+  "name": "windows-in-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "شبیه‌ساز ویندوز برای موبایل — React Native (Expo) + Fastify + PostgreSQL",
+  "scripts": {
+    "install:all": "npm --prefix apps/mobile install && npm --prefix apps/server install",
+    "dev:api": "npm --prefix apps/server run dev",
+    "dev:web": "npm --prefix apps/mobile run web",
+    "build:web": "npm --prefix apps/mobile run build:web",
+    "start": "npm --prefix apps/server run start",
+    "test": "npm --prefix apps/server test && npm --prefix apps/mobile test",
+    "test:e2e": "npm --prefix apps/mobile run test:e2e",
+    "typecheck": "npm --prefix apps/mobile run typecheck && npm --prefix apps/server run typecheck"
+  }
+}

@@ -1,0 +1,12 @@
+!!brut.androlib.meta.MetaInfo
+apkFileName: windows-simulator.apk
+isFrameworkApk: false
+usesFramework:
+  ids:
+  - 1
+sdkInfo:
+  minSdkVersion: '21'
+  targetSdkVersion: '34'
+packageInfo:
+  forcedPackageId: '127'
+version: 2.9.3

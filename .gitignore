@@ -1,0 +1,32 @@
+# وابستگی‌ها
+node_modules/
+
+# خروجی ساخت (وب‌اپ)
+dist/
+web-build/
+.expo/
+
+# داده‌های محلی PGlite و لاگ‌ها
+.data/
+*.log
+npm-debug.*
+yarn-error.*
+
+# فایل‌های محیطی
+.env
+.env*.local
+
+# سیستم‌عامل
+.DS_Store
+Thumbs.db
+
+# تایپ‌اسکریپت
+*.tsbuildinfo
+
+# ابزارها و خروجی ساخت APK
+tools/apk/.tools/
+tools/apk/android/assets/
+tools/apk/android/build/
+tools/apk/android/dist/
+tools/apk/android/res/mipmap-*/
+apps/mobile/dist-android/
