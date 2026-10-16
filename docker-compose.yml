@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: wim-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: windows
+      POSTGRES_PASSWORD: windows
+      POSTGRES_DB: windows_sim
+    ports:
+      - '5432:5432'
+    volumes:
+      - wim-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U windows -d windows_sim']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  wim-pgdata:
