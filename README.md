@@ -159,7 +159,7 @@ EXPO_PUBLIC_API_URL=http://192.168.1.20:4000 npm --prefix apps/mobile run start
 
 | لینک | توضیح |
 |---|---|
-| `https://warmahdi651-stack.github.io/app/windows-simulator.apk` | از سایت منتشرشده (پیشنهادی) |
+| `https://warmahdi651-stack.github.io/app/Windows-in-Mobile-v2.0.0.apk` | از سایت منتشرشده (پیشنهادی) |
 | `https://github.com/warmahdi651-stack/app/raw/arena/1db484ac-app/releases/Windows-in-Mobile-v2.0.0.apk` | از مخزن گیت‌هاب |
 | `https://cdn.jsdelivr.net/gh/warmahdi651-stack/app@arena/1db484ac-app/releases/Windows-in-Mobile-v2.0.0.apk` | از CDN |
 

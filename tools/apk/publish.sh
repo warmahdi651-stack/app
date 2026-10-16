@@ -41,6 +41,7 @@ p = "README.md"
 s = open(p, encoding="utf-8").read()
 # نام فایل جدید
 s = s.replace("releases/windows-simulator.apk", "releases/Windows-in-Mobile-v2.0.0.apk")
+s = s.replace("github.io/app/windows-simulator.apk", "github.io/app/Windows-in-Mobile-v2.0.0.apk")
 # اشارهٔ لینک‌های raw/cdn به شاخهٔ جاری (تا دانلود بلافاصله کار کند)
 s = s.replace("app/raw/main/releases/Windows-in-Mobile-v2.0.0.apk",
               f"app/raw/{branch}/releases/Windows-in-Mobile-v2.0.0.apk")
