@@ -1,0 +1,57 @@
+name: انتشار نسخهٔ وب در GitHub Pages
+
+on:
+  push:
+    branches: [main, arena/b6003a9f-app]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ساخت نسخهٔ وب
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/mobile/package-lock.json
+
+      - name: نصب وابستگی‌ها
+        run: npm ci
+        working-directory: apps/mobile
+
+      - name: ساخت خروجی وب
+        run: npx expo export --platform web --output-dir dist --clear
+        working-directory: apps/mobile
+
+      - name: حذف فونت‌های بلااستفاده (فقط Ionicones لازم است)
+        run: find dist -name '*.ttf' ! -name 'Ionicons*' -delete
+        working-directory: apps/mobile
+
+      - name: بارگذاری artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/mobile/dist
+
+  deploy:
+    name: انتشار
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: انتشار در GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
