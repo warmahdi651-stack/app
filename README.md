@@ -155,7 +155,20 @@ EXPO_PUBLIC_API_URL=http://192.168.1.20:4000 npm --prefix apps/mobile run start
 
 ## ساخت فایل نصبی (APK) برای گوشی
 
-### ✅ راه اول: ساخت مستقیم APK در همین ریپو (بدون Android Studio و بدون Gradle)
+### 📥 دانلود فایل نصبی آماده
+
+| لینک | توضیح |
+|---|---|
+| `https://warmahdi651-stack.github.io/app/windows-simulator.apk` | از سایت منتشرشده (پیشنهادی) |
+| `https://github.com/warmahdi651-stack/app/raw/arena/b6003a9f-app/releases/windows-simulator.apk` | از مخزن گیت‌هاب |
+| `https://cdn.jsdelivr.net/gh/warmahdi651-stack/app@arena/b6003a9f-app/releases/windows-simulator.apk` | از CDN |
+
+- پکیج: `com.arena.windowsinmobile` — امضای v1 + v2 + v3 — اندروید ۵ به بالا — حدود ۳٫۳ مگابایت
+- پس از دانلود، در تنظیمات گوشی به فایل‌منیجر اجازهٔ **«نصب از منابع ناشناس»** بدهید.
+- اپ در حالت **آفلاین/مهمان** اجرا می‌شود و داده‌ها را در حافظهٔ محلی گوشی نگه می‌دارد.
+  برای ورود و همگام‌سازی با PostgreSQL باید آدرس یک سرور در دسترس باشد.
+
+### 🛠 ساخت مستقیم APK در همین ریپو (بدون Android Studio و بدون Gradle)
 
 ```bash
 bash tools/apk/build.sh
@@ -166,9 +179,6 @@ bash tools/apk/build.sh
 
 ابزارهای لازم (apktool، apksigner، android.jar و JDK) به‌صورت خودکار از npm، GitHub و PyPI
 دانلود می‌شوند؛ جزئیات در [`tools/apk/README.md`](tools/apk/README.md) آمده است.
-
-> اپ در حالت **آفلاین/مهمان** اجرا می‌شود و داده‌ها را در حافظهٔ محلی گوشی نگه می‌دارد.
-> برای ورود و همگام‌سازی با PostgreSQL باید آدرس یک سرور در دسترس باشد.
 
 ### راه‌های دیگر
 
