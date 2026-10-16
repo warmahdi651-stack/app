@@ -155,9 +155,26 @@ EXPO_PUBLIC_API_URL=http://192.168.1.20:4000 npm --prefix apps/mobile run start
 
 ## ساخت فایل نصبی (APK) برای گوشی
 
-این پروژه یک اپ Expo است، پس برای گرفتن فایل نصبی سه راه دارید:
+### ✅ راه اول: ساخت مستقیم APK در همین ریپو (بدون Android Studio و بدون Gradle)
 
-### ۱) تست سریع بدون نصب (توصیه‌شده) — Expo Go
+```bash
+bash tools/apk/build.sh
+```
+
+خروجی: `apps/mobile/dist-android/windows-simulator.apk` — یک APK واقعی، امضاشده (v1+v2+v3)،
+قابل نصب روی هر گوشی اندروید ۵ به بالا (نام پکیج: `com.arena.windowsinmobile`).
+
+ابزارهای لازم (apktool، apksigner، android.jar و JDK) به‌صورت خودکار از npm، GitHub و PyPI
+دانلود می‌شوند؛ جزئیات در [`tools/apk/README.md`](tools/apk/README.md) آمده است.
+
+> اپ در حالت **آفلاین/مهمان** اجرا می‌شود و داده‌ها را در حافظهٔ محلی گوشی نگه می‌دارد.
+> برای ورود و همگام‌سازی با PostgreSQL باید آدرس یک سرور در دسترس باشد.
+
+### راه‌های دیگر
+
+این پروژه یک اپ Expo است، پس این راه‌ها هم در دسترس‌اند:
+
+### ۱) تست سریع بدون نصب — Expo Go
 
 ```bash
 cd apps/mobile

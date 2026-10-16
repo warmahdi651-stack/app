@@ -22,3 +22,11 @@ Thumbs.db
 
 # تایپ‌اسکریپت
 *.tsbuildinfo
+
+# ابزارها و خروجی ساخت APK
+tools/apk/.tools/
+tools/apk/android/assets/
+tools/apk/android/build/
+tools/apk/android/dist/
+tools/apk/android/res/mipmap-*/
+apps/mobile/dist-android/
