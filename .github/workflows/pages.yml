@@ -6,17 +6,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
+  contents: write
 
 jobs:
   build:
-    name: ساخت نسخهٔ وب
+    name: ساخت و انتشار نسخهٔ وب
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,23 +29,16 @@ jobs:
         run: npx expo export --platform web --output-dir dist --clear
         working-directory: apps/mobile
 
-      - name: حذف فونت‌های بلااستفاده (فقط Ionicones لازم است)
+      - name: حذف فونت‌های بلااستفاده (فقط Ionicons لازم است)
         run: find dist -name '*.ttf' ! -name 'Ionicons*' -delete
         working-directory: apps/mobile
 
-      - name: بارگذاری artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: انتشار روی شاخهٔ gh-pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: apps/mobile/dist
-
-  deploy:
-    name: انتشار
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: انتشار در GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apps/mobile/dist
+          publish_branch: gh-pages
+          user_name: arena-agent
+          user_email: agent@arena.ai
+          commit_message: 'build: انتشار نسخهٔ وب ({#})'
