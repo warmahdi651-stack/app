@@ -150,3 +150,56 @@ npm --prefix apps/mobile run ios
 ```bash
 EXPO_PUBLIC_API_URL=http://192.168.1.20:4000 npm --prefix apps/mobile run start
 ```
+
+---
+
+## ساخت فایل نصبی (APK) برای گوشی
+
+این پروژه یک اپ Expo است، پس برای گرفتن فایل نصبی سه راه دارید:
+
+### ۱) تست سریع بدون نصب (توصیه‌شده) — Expo Go
+
+```bash
+cd apps/mobile
+npm install
+npx expo start
+```
+
+سپس با اپ **Expo Go** (اندروید/آی‌اس) کد QR را اسکن کنید. اگر گوشی و کامپیوتر روی یک شبکه نیستند:
+
+```bash
+npx expo start --tunnel
+```
+
+> برای اتصال به سرور روی کامپیوتر خودتان:
+> `EXPO_PUBLIC_API_URL=http://<آی‌پی-کامپیوتر>:4000 npx expo start`
+
+### ۲) ساخت APK از طریق EAS Build (خروجی قابل دانلود)
+
+پیکربندی از قبل در `apps/mobile/eas.json` آماده است:
+
+```bash
+cd apps/mobile
+npm install -g eas-cli
+eas login                 # یک‌بار برای ورود به حساب Expo
+eas build -p android --profile preview
+```
+
+خروجی یک فایل APK است که لینک دانلودش از طریق ایمیل/پنل EAS برایتان ارسال می‌شود.
+(پروفایل `production` خروجی AAB برای انتشار در فروشگاه می‌سازد.)
+
+### ۳) ساخت محلی APK (نیازمند Android Studio)
+
+```bash
+cd apps/mobile
+npx expo prebuild --platform android   # تولید پوشهٔ android/
+cd android && ./gradlew assembleDebug  # خروجی: android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+### ۴) بدون نصب هیچ‌چیز — نسخهٔ وب
+
+```bash
+npm run install:all
+npm run build:web
+npm start        # سپس در مرورگر: http://localhost:4000
+```
