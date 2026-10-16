@@ -36,6 +36,9 @@ jobs:
       - name: افزودن APK نسخهٔ ۲
         run: cp releases/Windows-in-Mobile-v2.0.1.apk apps/mobile/dist/Windows-in-Mobile-v2.0.1.apk
 
+      - name: ساخت صفحهٔ دانلود
+        run: bash tools/apk/publish.sh
+
       - name: انتشار روی شاخهٔ gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
