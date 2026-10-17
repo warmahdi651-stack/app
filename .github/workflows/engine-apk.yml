@@ -49,7 +49,22 @@ jobs:
         working-directory: engine
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon assembleRelease
+          set +e
+          ./gradlew --no-daemon --stacktrace assembleRelease > "$GITHUB_WORKSPACE/gradle.log" 2>&1
+          RC=$?
+          set -e
+          if [ "$RC" -ne 0 ]; then
+            # Surface the real failure as annotations (readable via the GitHub API).
+            WHAT=$(grep -A12 "What went wrong" "$GITHUB_WORKSPACE/gradle.log" | head -14 | sed -e 's/%/%25/g' -e 's/\r//g' | awk '{printf "%s%%0A", $0}')
+            TAIL=$(tail -40 "$GITHUB_WORKSPACE/gradle.log" | sed -e 's/%/%25/g' -e 's/\r//g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=What went wrong::$WHAT"
+            echo "::error title=Gradle tail::$TAIL"
+            exit "$RC"
+          fi
+
+      - name: Keep Gradle log
+        if: always()
+        run: mkdir -p "$GITHUB_WORKSPACE/out" && cp "$GITHUB_WORKSPACE/gradle.log" "$GITHUB_WORKSPACE/out/gradle.log" 2>/dev/null || true
 
       - name: Collect APK
         run: |
@@ -60,6 +75,7 @@ jobs:
           ls -l out
 
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: windows-in-mobile-engine
           path: out/
