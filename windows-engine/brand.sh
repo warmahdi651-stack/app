@@ -154,5 +154,45 @@ replace_once("app/src/main/java/com/winlator/core/StringUtils.java",
     'getIdentifier(resName, "string", context.getPackageName())',
     'getIdentifier(resName, "string", "com.winlator")')
 
+# 6) User-visible product names: Winlator -> Gamelator (technical component names such as
+#    Wine, Box64, DXVK stay as they are; the About dialog keeps the upstream credit).
+def sub_all(rel, pairs):
+    text = read(rel)
+    for old, new in pairs:
+        if old not in text:
+            raise SystemExit(f"[brand] visible name anchor missing in {rel}: {old[:60]!r}")
+        text = text.replace(old, new)
+    write(rel, text)
+    print(f"[brand] visible names updated in {rel}")
+
+for lang_dir in ["values", "values-pt", "values-ru"]:
+    rel = f"app/src/main/res/{lang_dir}/strings.xml"
+    text = read(rel)
+    if "Winlator" in text:
+        write(rel, text.replace("Winlator", "Gamelator"))
+        print(f"[brand] Winlator -> Gamelator in {rel}")
+
+sub_all("app/src/main/java/com/winlator/services/ForegroundService.java", [
+    ('"Winlator:ForegroundService"', '"Gamelator:ForegroundService"'),
+    ('"Winlator",', '"Gamelator",'),
+    ('"Winlator is running in the background"', '"Gamelator is running in the background"'),
+    ('"winlator.FGS"', '"gamelator.FGS"'),
+])
+sub_all("app/src/main/java/com/winlator/services/NotificationUtils.java", [
+    ('"winlator_foreground_service"', '"gamelator_foreground_service"'),
+    ('"Winlator Foreground Service"', '"Gamelator Foreground Service"'),
+    ('"Allows to display Winlator foreground notifications"', '"Allows to display Gamelator foreground notifications"'),
+])
+sub_all("app/src/main/java/com/winlator/inputcontrols/InputControlsManager.java", [
+    ('"Winlator/profiles/"', '"Gamelator/profiles/"'),
+])
+sub_all("app/src/main/java/com/winlator/widget/LogView.java", [
+    ('DIRECTORY_DOCUMENTS), "Winlator")', 'DIRECTORY_DOCUMENTS), "Gamelator")'),
+])
+# Real data directory of the app is /data/data/<applicationId>; the hard-coded path must match it.
+sub_all("app/src/main/java/com/winlator/core/AppUtils.java", [
+    ('"/data/data/com.winlator/storage"', '"/data/data/com.arena.gamelator/storage"'),
+])
+
 print("[brand] done")
 PY
