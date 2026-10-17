@@ -84,6 +84,7 @@ jobs:
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           TAG="windows-engine-r${GITHUB_RUN_NUMBER}"
           gh release create "$TAG" out/Windows-in-Mobile-Engine.apk out/SHA256SUMS.txt \
