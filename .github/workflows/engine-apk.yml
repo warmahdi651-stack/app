@@ -74,6 +74,18 @@ jobs:
           sha256sum out/Windows-in-Mobile-Engine.apk | tee out/SHA256SUMS.txt
           ls -l out
 
+      - name: Verify APK contents
+        run: |
+          BT="$(ls -d "$ANDROID_HOME"/build-tools/35.0.0 | head -1)"
+          APK=out/Windows-in-Mobile-Engine.apk
+          "$BT/apksigner" verify --print-certs "$APK" | head -5
+          "$BT/aapt" dump badging "$APK" | grep -E "^package|sdkVersion|application-label:|native-code" || true
+          unzip -t -q "$APK"
+          unzip -l "$APK" | grep -E "classes.dex|lib/arm64-v8a/lib.*\.so" | head -20
+          unzip -l "$APK" | grep -q "classes.dex"
+          unzip -l "$APK" | grep -q "lib/arm64-v8a/"
+          echo "APK verification passed"
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
