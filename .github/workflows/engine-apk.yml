@@ -1,0 +1,72 @@
+name: Windows Engine APK
+
+on:
+  push:
+    branches: [arena/3fb7149b-app]
+    paths:
+      - 'windows-engine/**'
+      - '.github/workflows/engine-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: app
+
+      - name: Fetch upstream engine source (pinned)
+        run: |
+          git clone https://github.com/brunodev85/winlator-app.git engine
+          git -C engine checkout 8077f374ef2d54127b088de9e8cd7b4af14d9c8b
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install SDK components (NDK 24, CMake 3.22.1)
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;24.0.8215888" "cmake;3.22.1"
+
+      - name: Apply Windows in Mobile branding
+        run: bash app/windows-engine/brand.sh engine
+
+      - name: Build release APK
+        working-directory: engine
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleRelease
+
+      - name: Collect APK
+        run: |
+          mkdir -p out
+          APK=$(ls engine/app/build/outputs/apk/release/*.apk | head -1)
+          cp "$APK" out/Windows-in-Mobile-Engine.apk
+          sha256sum out/Windows-in-Mobile-Engine.apk | tee out/SHA256SUMS.txt
+          ls -l out
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-in-mobile-engine
+          path: out/
+          retention-days: 30
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="windows-engine-r${GITHUB_RUN_NUMBER}"
+          gh release create "$TAG" out/Windows-in-Mobile-Engine.apk out/SHA256SUMS.txt \
+            --target "$GITHUB_SHA" \
+            --title "Windows in Mobile Engine (build ${GITHUB_RUN_NUMBER})" \
+            --notes "Winlator-based Windows (x86_64) runtime for Android 8+ (arm64). Built from brunodev85/winlator-app@8077f374 with Windows in Mobile branding." \
+            --latest
