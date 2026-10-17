@@ -39,6 +39,14 @@ for rel in ["app/src/main/AndroidManifest.xml", "app/src/main/java/com/winlator/
     p.write_text(text.replace("com.winlator.FileProvider", "com.arena.windowsinmobile.engine.FileProvider"), encoding="utf-8")
     print(f"[brand] FileProvider authority -> new id in {rel}")
 
+# 1c) Asset compression (143 MB of .tzst runtime files) needs a larger JVM heap than the default.
+gp = root / "gradle.properties"
+text = gp.read_text(encoding="utf-8") if gp.exists() else ""
+lines = [l for l in text.splitlines() if not l.startswith("org.gradle.jvmargs")]
+lines.append("org.gradle.jvmargs=-Xmx6g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8")
+gp.write_text("\n".join(lines) + "\n", encoding="utf-8")
+print("[brand] gradle.properties: jvmargs -Xmx6g")
+
 # 2) App name (default + Portuguese + Russian resources) -> English.
 for lang_dir in ["values", "values-pt", "values-ru"]:
     f = f"app/src/main/res/{lang_dir}/strings.xml"
