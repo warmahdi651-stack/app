@@ -42,7 +42,7 @@ jobs:
           echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
           echo "ANDROID_NDK_HOME=$SDK/ndk/24.0.8215888" >> "$GITHUB_ENV"
 
-      - name: Apply Windows in Mobile branding
+      - name: Apply Gamelator branding
         run: bash app/windows-engine/brand.sh engine
 
       - name: Build release APK
@@ -70,14 +70,14 @@ jobs:
         run: |
           mkdir -p out
           APK=$(ls engine/app/build/outputs/apk/release/*.apk | head -1)
-          cp "$APK" out/Windows-in-Mobile-Engine.apk
-          sha256sum out/Windows-in-Mobile-Engine.apk | tee out/SHA256SUMS.txt
+          cp "$APK" out/Gamelator.apk
+          sha256sum out/Gamelator.apk | tee out/SHA256SUMS.txt
           ls -l out
 
       - name: Verify APK contents
         run: |
           BT="$(ls -d "$ANDROID_HOME"/build-tools/35.0.0 | head -1)"
-          APK=out/Windows-in-Mobile-Engine.apk
+          APK=out/Gamelator.apk
           "$BT/apksigner" verify --print-certs "$APK" | head -5
           "$BT/aapt" dump badging "$APK" | grep -E "^package|sdkVersion|application-label:|native-code" || true
           unzip -t -q "$APK"
@@ -98,9 +98,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          TAG="windows-engine-r${GITHUB_RUN_NUMBER}"
-          gh release create "$TAG" out/Windows-in-Mobile-Engine.apk out/SHA256SUMS.txt \
+          TAG="gamelator-r${GITHUB_RUN_NUMBER}"
+          gh release create "$TAG" out/Gamelator.apk out/SHA256SUMS.txt \
             --target "$GITHUB_SHA" \
-            --title "Windows in Mobile Engine (build ${GITHUB_RUN_NUMBER})" \
-            --notes "Winlator-based Windows (x86_64) runtime for Android 8+ (arm64). Built from brunodev85/winlator-app@8077f374 with Windows in Mobile branding." \
+            --title "Gamelator (build ${GITHUB_RUN_NUMBER})" \
+            --notes "Gamelator: a game-focused Windows (x86_64) runtime for Android 8+ (arm64), based on Winlator (LGPL-2.1). Source: brunodev85/winlator-app@8077f374 + Gamelator patch." \
             --latest
