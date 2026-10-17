@@ -14,7 +14,7 @@ import pathlib, re, shutil, sys
 root = pathlib.Path(sys.argv[1])
 icons = pathlib.Path(sys.argv[2])
 HERE_SOUNDS = pathlib.Path(sys.argv[3])
-APP_ID = "com.arena.gamelator"
+APP_ID = "com.gamlator"
 
 def read(rel):
     return (root / rel).read_text(encoding="utf-8")
@@ -31,8 +31,8 @@ def replace_once(rel, old, new):
 
 # 1) Gradle: own application id, versioning, arm64-only release build with release signing.
 replace_once("app/build.gradle", "applicationId 'com.winlator'", f"applicationId '{APP_ID}'")
-replace_once("app/build.gradle", "versionCode 33", "versionCode 100")
-replace_once("app/build.gradle", 'versionName "11.2"', 'versionName "1.0.0-gamelator"')
+replace_once("app/build.gradle", "versionCode 33", "versionCode 101")
+replace_once("app/build.gradle", 'versionName "11.2"', 'versionName "1.1.0-gamelator"')
 replace_once("app/build.gradle", "    buildTypes {\n        debug {",
     "    buildTypes {\n        release {\n            signingConfig signingConfigs.debug\n            minifyEnabled false\n            ndk {\n                abiFilters 'arm64-v8a'\n            }\n        }\n        debug {")
 
@@ -73,17 +73,17 @@ replace_once("app/src/main/res/values/ic_launcher_background.xml",
 
 # 4) Colour palette: dark "night arcade" theme (not Winlator's grey/blue palette).
 palette = {
-    "colorAccent": "#FF3D7F",
-    "colorPrimary": "#101827",
-    "colorPrimaryDark": "#070A12",
-    "colorControlNormal": "#3A4766",
-    "colorPrimaryText": "#F2F5FF",
-    "colorSecondaryText": "#8FA0C6",
-    "colorPrimarySurface": "#0B0F1A",
-    "colorSecondarySurface": "#151D33",
-    "colorPrimaryVariant": "#1F2A48",
-    "colorSecondaryVariant": "#243156",
-    "colorError": "#FF5C7A",
+    "colorAccent": "#00E5FF",
+    "colorPrimary": "#1B1140",
+    "colorPrimaryDark": "#07050F",
+    "colorControlNormal": "#3B3366",
+    "colorPrimaryText": "#F4F1FF",
+    "colorSecondaryText": "#A89BD6",
+    "colorPrimarySurface": "#0A0716",
+    "colorSecondarySurface": "#141029",
+    "colorPrimaryVariant": "#2A1B5C",
+    "colorSecondaryVariant": "#1F1A3D",
+    "colorError": "#FF4D6D",
 }
 styles = "app/src/main/res/values/styles.xml"
 text = read(styles)
@@ -191,7 +191,7 @@ sub_all("app/src/main/java/com/winlator/widget/LogView.java", [
 ])
 # Real data directory of the app is /data/data/<applicationId>; the hard-coded path must match it.
 sub_all("app/src/main/java/com/winlator/core/AppUtils.java", [
-    ('"/data/data/com.winlator/storage"', '"/data/data/com.arena.gamelator/storage"'),
+    ('"/data/data/com.winlator/storage"', '"/data/data/com.gamlator/storage"'),
 ])
 
 # 7) Device tuning section (Samsung / Xiaomi): recommended settings + shortcuts to system pages.
@@ -226,21 +226,6 @@ public final class GamelatorDeviceTuning {
     private static final String XIAOMI_AUTOSTART = "com.miui.securitycenter/com.miui.permcenter.autostart.AutoStartManagementActivity";
 
     private GamelatorDeviceTuning() {}
-
-    /** Adds the "Device tuning" entry at the top of the Settings screen. */
-    public static void addEntry(View root, Context context) {
-        try {
-            ViewGroup scroll = (ViewGroup) ((ViewGroup) root).getChildAt(0);
-            ViewGroup column = (ViewGroup) scroll.getChildAt(0);
-            Button button = new Button(context);
-            button.setText("Device tuning (Samsung / Xiaomi)");
-            button.setAllCaps(false);
-            button.setOnClickListener(v -> show(context));
-            column.addView(button, 0);
-        } catch (Exception ignored) {
-            // Settings still works without the shortcut.
-        }
-    }
 
     public static void show(Context context) {
         String brand = Build.MANUFACTURER == null ? "" : Build.MANUFACTURER.toLowerCase(Locale.ROOT);
@@ -277,7 +262,7 @@ public final class GamelatorDeviceTuning {
         ScrollView scroll = new ScrollView(context);
         scroll.addView(column);
         new AlertDialog.Builder(context)
-            .setTitle("Device tuning")
+            .setTitle("Device Tuning")
             .setView(scroll)
             .setPositiveButton("Close", null)
             .show();
@@ -358,9 +343,141 @@ public final class GamelatorDeviceTuning {
 """, encoding="utf-8")
 print("[brand] GamelatorDeviceTuning.java added")
 
-replace_once("app/src/main/java/com/winlator/SettingsFragment.java",
-    "preferences = PreferenceManager.getDefaultSharedPreferences(context);",
-    "preferences = PreferenceManager.getDefaultSharedPreferences(context);\n        com.winlator.core.GamelatorDeviceTuning.addEntry(view, context);")
+# 8) Gamelator's own drawables, layouts and drawer menu (windows-engine/gamelator-res).
+res_src = icons.parent / "gamelator-res"
+res_dst = root / "app/src/main/res"
+for sub in ["drawable", "drawable-xxhdpi", "layout", "menu"]:
+    src_dir = res_src / sub
+    if not src_dir.is_dir():
+        continue
+    (res_dst / sub).mkdir(parents=True, exist_ok=True)
+    for f in src_dir.iterdir():
+        shutil.copyfile(f, res_dst / sub / f.name)
+print("[brand] Gamelator drawables, layouts and drawer menu copied")
+
+# 8b) Visible strings: navigation labels, loading text, device tuning entry.
+STRINGS = [
+    ("shortcuts", "Library"),
+    ("containers", "Prefixes"),
+    ("input_controls", "Controls"),
+    ("starting_up", "Warming up the engine..."),
+    ("device_tuning", "Device Tuning"),
+    ("gamelator_tagline", "PLAY WINDOWS GAMES"),
+    ("gamelator_tagline_short", "GAMELATOR"),
+]
+for lang_dir in ["values", "values-pt", "values-ru"]:
+    rel = f"app/src/main/res/{lang_dir}/strings.xml"
+    text = read(rel)
+    for name, value in STRINGS:
+        pat = re.compile(rf'<string name="{name}"[^>]*>[^<]*</string>')
+        if pat.search(text):
+            text = pat.sub(lambda _m, n=name, v=value: f'<string name="{n}">{v}</string>', text, count=1)
+        else:
+            text = text.replace("</resources>", f'    <string name="{name}">{value}</string>\n</resources>', 1)
+    write(rel, text)
+print("[brand] visible strings updated")
+
+# 8c) Theme: gradient window, dialogs/panels/preloader and toolbar use Gamelator drawables.
+def patch_block(text, style_name, pairs):
+    m = re.search(rf'<style name="{style_name}".*?</style>', text, re.S)
+    if not m:
+        raise SystemExit(f"[brand] style {style_name} not found")
+    block = m.group(0)
+    new = block
+    for old, repl in pairs:
+        if old not in new:
+            raise SystemExit(f"[brand] {style_name}: anchor missing {old[:60]!r}")
+        new = new.replace(old, repl, 1)
+    return text.replace(block, new, 1)
+
+styles_rel = "app/src/main/res/values/styles.xml"
+text = read(styles_rel)
+text = patch_block(text, "AppThemeBase", [
+    ('<item name="android:windowBackground">?attr/colorPrimarySurface</item>',
+     '<item name="android:windowBackground">@drawable/gl_window_bg</item>'),
+])
+text = patch_block(text, "AppThemeDark", [
+    ("@drawable/content_dialog_background_dark", "@drawable/gl_dialog_bg"),
+    ("@drawable/toolbox_dark", "@drawable/gl_panel_bg"),
+    ("@drawable/panel_background_dark", "@drawable/gl_panel_bg"),
+    ("@drawable/preloader_background_dark", "@drawable/gl_preloader_bg"),
+])
+text = patch_block(text, "Toolbar", [
+    ('<item name="android:background">?attr/colorPrimary</item>',
+     '<item name="android:background">@drawable/gl_toolbar_bg</item>'),
+])
+write(styles_rel, text)
+print("[brand] Gamelator theme drawables applied")
+
+# 8d) Drawer: gradient background and a glowing selected-item pill.
+replace_once("app/src/main/res/layout/main_activity.xml",
+    'android:background="?attr/colorSecondarySurface"',
+    'android:background="@drawable/gl_drawer_bg"\n        app:itemBackground="@drawable/gl_item_selected"')
+
+# 9) Device Tuning opens from the drawer (its own menu entry), not from inside Settings.
+replace_once("app/src/main/java/com/winlator/MainActivity.java",
+    "            case R.id.menu_item_about:",
+    "            case R.id.menu_item_device_tuning:\n"
+    "                com.winlator.core.GamelatorDeviceTuning.show(this);\n"
+    "                drawerLayout.closeDrawer(GravityCompat.START);\n"
+    "                break;\n"
+    "            case R.id.menu_item_about:")
+
+# 10) Native renderers connect to the X11/Vortek sockets under the data directory.
+for rel in ["app/src/main/cpp/gladiorenderer/include/gladio.h",
+            "app/src/main/cpp/vortekrenderer/include/vortek.h"]:
+    text = read(rel)
+    if "/data/data/com.winlator/" not in text:
+        raise SystemExit(f"[brand] socket path not found in {rel}")
+    write(rel, text.replace("/data/data/com.winlator/", "/data/data/com.gamlator/"))
+    print(f"[brand] socket path -> com.gamlator in {rel}")
 
 print("[brand] done")
+PY
+
+# 11) Bundled archives (rootfs, Wine, container pattern, ...) contain the old data path in
+#     binaries and config files. Rewrite com.winlator -> com.gamlator. Both names are 12 bytes,
+#     so ELF offsets and tar sizes stay valid. Symlink targets may change length safely.
+if ! python3 -c "import zstandard" >/dev/null 2>&1; then
+  python3 -m pip install --quiet --user --break-system-packages zstandard
+fi
+python3 - "$DIR/app/src/main/assets" <<'PY'
+import io, os, pathlib, sys, tarfile
+import zstandard
+
+OLD, NEW = b"com.winlator", b"com.gamlator"
+assert len(OLD) == len(NEW)
+root = pathlib.Path(sys.argv[1])
+for path in sorted(root.rglob("*.tzst")):
+    tmp = path.with_name(path.name + ".tmp")
+    changed = 0
+    with path.open("rb") as src, \
+         zstandard.ZstdDecompressor().stream_reader(src) as reader, \
+         tarfile.open(fileobj=reader, mode="r|") as tin, \
+         tmp.open("wb") as out, \
+         zstandard.ZstdCompressor(level=19).stream_writer(out) as writer, \
+         tarfile.open(fileobj=writer, mode="w|") as tout:
+        for m in tin:
+            data = None
+            if m.isreg():
+                data = tin.extractfile(m).read()
+                if OLD in data:
+                    data = data.replace(OLD, NEW)
+                    changed += 1
+            if OLD.decode() in m.name:
+                m.name = m.name.replace(OLD.decode(), NEW.decode())
+                changed += 1
+            if (m.issym() or m.islnk()) and OLD.decode() in m.linkname:
+                m.linkname = m.linkname.replace(OLD.decode(), NEW.decode())
+                changed += 1
+            if data is not None:
+                m.size = len(data)
+                tout.addfile(m, io.BytesIO(data))
+            else:
+                tout.addfile(m)
+    if changed:
+        os.replace(tmp, path)
+        print(f"[brand] {path.relative_to(root)}: {changed} data-path entries rewritten")
+    else:
+        tmp.unlink()
 PY
