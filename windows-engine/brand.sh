@@ -6,12 +6,14 @@ set -euo pipefail
 DIR="${1:?usage: brand.sh <winlator-app dir>}"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ICONS="$HERE/gamelator-icons"
+HERE_SOUNDS="$HERE/gamelator-sounds"
 
-python3 - "$DIR" "$ICONS" <<'PY'
+python3 - "$DIR" "$ICONS" "$HERE_SOUNDS" <<'PY'
 import pathlib, re, shutil, sys
 
 root = pathlib.Path(sys.argv[1])
 icons = pathlib.Path(sys.argv[2])
+HERE_SOUNDS = pathlib.Path(sys.argv[3])
 APP_ID = "com.arena.gamelator"
 
 def read(rel):
@@ -101,6 +103,56 @@ if n != 1:
     raise SystemExit("[brand] TextView style not found")
 write(styles, text)
 print("[brand] dark palette + condensed system font applied")
+
+# 5) Own sound effects + startup chime (original audio, see make-gamelator-sounds.py).
+raw = root / "app/src/main/res/raw"
+raw.mkdir(parents=True, exist_ok=True)
+for wav in (HERE_SOUNDS).glob("*.wav"):
+    shutil.copyfile(wav, raw / wav.name)
+print("[brand] Gamelator sounds copied to res/raw")
+
+(root / "app/src/main/java/com/winlator/core/GamelatorSound.java").write_text(
+"""package com.winlator.core;
+
+import android.content.Context;
+import android.media.MediaPlayer;
+
+import com.winlator.R;
+
+/** Plays Gamelator's own startup chime. Failures are ignored so audio never blocks the app. */
+public final class GamelatorSound {
+    private static MediaPlayer player;
+
+    private GamelatorSound() {}
+
+    public static void playStartup(Context context) {
+        try {
+            if (player != null) player.release();
+            player = MediaPlayer.create(context.getApplicationContext(), R.raw.gamelator_startup);
+            if (player == null) return;
+            player.setVolume(0.6f, 0.6f);
+            player.setOnCompletionListener(MediaPlayer::release);
+            player.start();
+        } catch (Exception ignored) {
+            player = null;
+        }
+    }
+}
+""", encoding="utf-8")
+print("[brand] GamelatorSound.java added")
+
+# MainActivity: play the chime once the activity is created.
+replace_once("app/src/main/java/com/winlator/MainActivity.java",
+    "import com.winlator.core.Callback;",
+    "import com.winlator.core.Callback;\nimport com.winlator.core.GamelatorSound;")
+replace_once("app/src/main/java/com/winlator/MainActivity.java",
+    "super.onCreate(savedInstanceState);",
+    "super.onCreate(savedInstanceState);\n        GamelatorSound.playStartup(this);")
+
+# Resource lookup must use the resource package (namespace), not the application id.
+replace_once("app/src/main/java/com/winlator/core/StringUtils.java",
+    'getIdentifier(resName, "string", context.getPackageName())',
+    'getIdentifier(resName, "string", "com.winlator")')
 
 print("[brand] done")
 PY
