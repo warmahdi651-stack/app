@@ -432,6 +432,167 @@ for rel in ["app/src/main/cpp/gladiorenderer/include/gladio.h",
     write(rel, text.replace("/data/data/com.winlator/", "/data/data/com.gamlator/"))
     print(f"[brand] socket path -> com.gamlator in {rel}")
 
+# 12) Per-Windows-version desktop: original wallpapers and boot cues, FPS on startup.
+shell = icons.parent / "gamelator-shell"
+assets_wall = root / "app/src/main/assets/wallpapers"
+for old in ["wallpaper-1", "wallpaper-2", "wallpaper-3"]:
+    if (assets_wall / old).exists():
+        shutil.rmtree(assets_wall / old)
+for src_dir in sorted((shell / "wallpapers").iterdir()):
+    dst_dir = assets_wall / src_dir.name
+    if dst_dir.exists():
+        shutil.rmtree(dst_dir)
+    shutil.copytree(src_dir, dst_dir)
+print("[brand] Gamelator wallpapers installed (auto, win7, win8, win10, win11)")
+
+raw_dst = root / "app/src/main/res/raw"
+raw_dst.mkdir(parents=True, exist_ok=True)
+for wav in (shell / "raw").glob("*.wav"):
+    shutil.copyfile(wav, raw_dst / wav.name)
+print("[brand] Gamelator boot cues copied to res/raw")
+
+WTM = "app/src/main/java/com/winlator/core/WineThemeManager.java"
+replace_once(WTM, 'DEFAULT_WALLPAPER_ID = "wallpaper-1";', 'DEFAULT_WALLPAPER_ID = "wallpaper-auto";')
+replace_once(WTM,
+    "public static void apply(Context context, ThemeInfo themeInfo, ScreenInfo screenInfo) {",
+    "public static void apply(Context context, ThemeInfo themeInfo, ScreenInfo screenInfo, String winVersion) {")
+replace_once(WTM,
+    "createWallpaperBMPFile(context, themeInfo.wallpaperId, screenInfo);",
+    "createWallpaperBMPFile(context, resolveWallpaperId(themeInfo.wallpaperId, winVersion), screenInfo);")
+replace_once(WTM,
+    "    public static File getUserWallpaperFile(Context context) {",
+    r'''    /** The default ("auto") wallpaper follows the container's Windows version. */
+    public static String resolveWallpaperId(String wallpaperId, String winVersion) {
+        if (!wallpaperId.equals(DEFAULT_WALLPAPER_ID) && !wallpaperId.equals("wallpaper-1")) return wallpaperId;
+        String family;
+        switch (winVersion == null ? "" : winVersion) {
+            case "win11": family = "win11"; break;
+            case "win81":
+            case "win8": family = "win8"; break;
+            case "win7":
+            case "win2008r2": family = "win7"; break;
+            default: family = "win10"; break;
+        }
+        return "wallpaper-" + family;
+    }
+
+    public static File getUserWallpaperFile(Context context) {''')
+
+replace_once("app/src/main/java/com/winlator/widget/ImagePickerView.java",
+    'Arrays.asList("wallpaper-1", "wallpaper-2", "wallpaper-3")',
+    'Arrays.asList("wallpaper-auto", "wallpaper-win7", "wallpaper-win8", "wallpaper-win10", "wallpaper-win11")')
+
+XSDA = "app/src/main/java/com/winlator/XServerDisplayActivity.java"
+replace_once(XSDA,
+    "WineThemeManager.apply(this, new WineThemeManager.ThemeInfo(desktopTheme), xServer.screenInfo);",
+    'WineThemeManager.apply(this, new WineThemeManager.ThemeInfo(desktopTheme), xServer.screenInfo, container.getExtra("winVersion"));')
+replace_once(XSDA,
+    'if (!(desktopTheme+","+xServer.screenInfo).equals(container.getExtra("desktopTheme"))) {',
+    'if (!(desktopTheme+","+xServer.screenInfo+","+container.getExtra("winVersion")).equals(container.getExtra("desktopTheme"))) {')
+replace_once(XSDA,
+    'container.putExtra("desktopTheme", desktopTheme+","+xServer.screenInfo);',
+    'container.putExtra("desktopTheme", desktopTheme+","+xServer.screenInfo+","+container.getExtra("winVersion"));')
+replace_once(XSDA,
+    "        preloaderDialog.show(R.string.starting_up);",
+    '        preloaderDialog.show(R.string.starting_up);\n'
+    '        com.winlator.core.GamelatorSound.playBoot(this, container != null ? container.getExtra("winVersion") : "");')
+replace_once(XSDA,
+    "        setupUI();\n",
+    r'''        setupUI();
+
+        final android.os.Handler startupFpsHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+        final float[] startupFps = {0f};
+        final long[] startupFpsTime = {0L};
+        final int[] startupFpsFrames = {0};
+        startupFpsHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (xServerView == null || !preloaderDialog.isShowing()) return;
+                int frames = xServerView.getRenderer().drawnFrames.get();
+                long now = android.os.SystemClock.elapsedRealtime();
+                if (startupFpsTime[0] > 0 && now > startupFpsTime[0]) {
+                    float instant = (frames - startupFpsFrames[0]) * 1000f / (now - startupFpsTime[0]);
+                    startupFps[0] = startupFps[0] <= 0 ? instant : startupFps[0] * 0.6f + instant * 0.4f;
+                    preloaderDialog.setFps(Math.round(startupFps[0]) + " FPS");
+                }
+                startupFpsFrames[0] = frames;
+                startupFpsTime[0] = now;
+                startupFpsHandler.postDelayed(this, 300);
+            }
+        });
+''')
+replace_once(XSDA,
+    "            if (frameRatingWindow != null) {",
+    "            if (frameRatingWindow == null && viewable && window.isSurface()) frameRatingWindow = window;\n"
+    "            if (frameRatingWindow != null) {")
+
+GLR = "app/src/main/java/com/winlator/renderer/GLRenderer.java"
+replace_once(GLR,
+    "    private final float[] tmpXForm1 = XForm.getInstance();",
+    "    public final java.util.concurrent.atomic.AtomicInteger drawnFrames = new java.util.concurrent.atomic.AtomicInteger();\n"
+    "    private final float[] tmpXForm1 = XForm.getInstance();")
+replace_once(GLR,
+    "    public void onDrawFrame(GL10 gl) {",
+    "    public void onDrawFrame(GL10 gl) {\n        drawnFrames.incrementAndGet();")
+
+FR = "app/src/main/java/com/winlator/widget/FrameRating.java"
+replace_once(FR,
+    "        addView(view);\n        setupPanels();",
+    "        addView(view);\n        setupPanels();\n        setPivotX(0);\n        setPivotY(0);\n        setScaleX(0.78f);\n        setScaleY(0.78f);")
+replace_once(FR, "if (time >= lastTime + 500) {", "if (time >= lastTime + 250) {")
+replace_once(FR,
+    "            lastFPS = ((float)(frameCount * 1000) / (time - lastTime));",
+    "            float instant = ((float)(frameCount * 1000) / (time - lastTime));\n"
+    "            lastFPS = lastFPS <= 0 ? instant : lastFPS * 0.6f + instant * 0.4f;")
+
+replace_once("app/src/main/java/com/winlator/container/Container.java",
+    "private byte hudMode = (byte)FrameRating.Mode.DISABLED.ordinal();",
+    "private byte hudMode = (byte)FrameRating.Mode.SIMPLE.ordinal();")
+
+replace_once("app/src/main/java/com/winlator/core/WineUtils.java",
+    "        WinVersions.WinVersion winVersion = WinVersions.getWinVersions()[winVersionIdx];",
+    "        WinVersions.WinVersion winVersion = WinVersions.getWinVersions()[winVersionIdx];\n"
+    '        container.putExtra("winVersion", winVersion.version);\n'
+    "        container.saveData();")
+
+PD = "app/src/main/java/com/winlator/core/PreloaderDialog.java"
+replace_once(PD, "import android.widget.TextView;", "import android.view.View;\nimport android.widget.TextView;")
+replace_once(PD, "    public boolean isShowing() {",
+    "    public synchronized void setFps(String text) {\n"
+    "        if (dialog == null) return;\n"
+    "        TextView tv = dialog.findViewById(R.id.FPSText);\n"
+    "        if (tv == null) return;\n"
+    "        tv.setVisibility(text == null ? View.GONE : View.VISIBLE);\n"
+    "        tv.setText(text);\n"
+    "    }\n\n"
+    "    public boolean isShowing() {")
+
+SND = "app/src/main/java/com/winlator/core/GamelatorSound.java"
+replace_once(SND, "    public static void playStartup(Context context) {",
+    r'''    /** Plays the boot cue of the container's Windows family (original audio). */
+    public static void playBoot(Context context, String winVersion) {
+        int resId;
+        switch (winVersion == null ? "" : winVersion) {
+            case "win7":
+            case "win2008r2": resId = R.raw.gamelator_boot_win7; break;
+            case "win81":
+            case "win8": resId = R.raw.gamelator_boot_win8; break;
+            case "win11": resId = R.raw.gamelator_boot_win11; break;
+            default: resId = R.raw.gamelator_boot_win10; break;
+        }
+        try {
+            if (player != null) player.release();
+            player = MediaPlayer.create(context.getApplicationContext(), resId);
+            if (player == null) return;
+            player.setVolume(0.7f, 0.7f);
+            player.setOnCompletionListener(MediaPlayer::release);
+            player.start();
+        } catch (Exception ignored) {
+            player = null;
+        }
+    }
+
+    public static void playStartup(Context context) {''')
 print("[brand] done")
 PY
 
