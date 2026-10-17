@@ -194,5 +194,173 @@ sub_all("app/src/main/java/com/winlator/core/AppUtils.java", [
     ('"/data/data/com.winlator/storage"', '"/data/data/com.arena.gamelator/storage"'),
 ])
 
+# 7) Device tuning section (Samsung / Xiaomi): recommended settings + shortcuts to system pages.
+(root / "app/src/main/java/com/winlator/core/GamelatorDeviceTuning.java").write_text(
+"""package com.winlator.core;
+
+import android.app.ActivityManager;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
+
+import java.util.Locale;
+
+/**
+ * Gamelator device tuning: recommended settings for Samsung and Xiaomi phones and shortcuts
+ * to the system pages that most often block background games. System page class names differ
+ * between firmware versions, so every shortcut falls back to the next option when it is missing.
+ */
+public final class GamelatorDeviceTuning {
+    private static final String SAMSUNG_BATTERY = "com.samsung.android.lool/com.samsung.android.sm.ui.battery.BatteryActivity";
+    private static final String XIAOMI_AUTOSTART = "com.miui.securitycenter/com.miui.permcenter.autostart.AutoStartManagementActivity";
+
+    private GamelatorDeviceTuning() {}
+
+    /** Adds the "Device tuning" entry at the top of the Settings screen. */
+    public static void addEntry(View root, Context context) {
+        try {
+            ViewGroup scroll = (ViewGroup) ((ViewGroup) root).getChildAt(0);
+            ViewGroup column = (ViewGroup) scroll.getChildAt(0);
+            Button button = new Button(context);
+            button.setText("Device tuning (Samsung / Xiaomi)");
+            button.setAllCaps(false);
+            button.setOnClickListener(v -> show(context));
+            column.addView(button, 0);
+        } catch (Exception ignored) {
+            // Settings still works without the shortcut.
+        }
+    }
+
+    public static void show(Context context) {
+        String brand = Build.MANUFACTURER == null ? "" : Build.MANUFACTURER.toLowerCase(Locale.ROOT);
+        long ramGb = totalRamGb(context);
+        boolean samsung = brand.contains("samsung");
+        boolean xiaomi = brand.contains("xiaomi") || brand.contains("redmi") || brand.contains("poco");
+
+        LinearLayout column = new LinearLayout(context);
+        column.setOrientation(LinearLayout.VERTICAL);
+        int pad = dp(context, 16);
+        column.setPadding(pad, pad, pad, pad);
+
+        addText(context, column, "Device: " + Build.MANUFACTURER + " " + Build.MODEL
+            + " | Android " + Build.VERSION.RELEASE + " | RAM about " + ramGb + " GB");
+        addText(context, column, "");
+        addText(context, column, "Recommended Gamelator settings:");
+        addText(context, column, recommendation(ramGb));
+        addText(context, column, "");
+
+        if (samsung) {
+            addText(context, column, "Samsung: set Gamelator to 'Unrestricted' in Battery, and turn off 'Put unused apps to sleep' for it.");
+        } else if (xiaomi) {
+            addText(context, column, "Xiaomi / HyperOS: allow Autostart, set Battery saver to 'No restrictions', and lock Gamelator in Recents.");
+        } else {
+            addText(context, column, "Turn off battery optimization for Gamelator and keep it out of background restrictions.");
+        }
+
+        addButton(context, column, "Open battery settings", () -> openBattery(context, samsung));
+        if (xiaomi) {
+            addButton(context, column, "Open autostart settings", () -> openComponentOrAppInfo(context, XIAOMI_AUTOSTART));
+        }
+        addButton(context, column, "Open Gamelator app info", () -> openAppInfo(context));
+
+        ScrollView scroll = new ScrollView(context);
+        scroll.addView(column);
+        new AlertDialog.Builder(context)
+            .setTitle("Device tuning")
+            .setView(scroll)
+            .setPositiveButton("Close", null)
+            .show();
+    }
+
+    private static String recommendation(long ramGb) {
+        if (ramGb >= 8) return "Screen 1280x720, Box64 preset PERFORMANCE. Lower the resolution if a game lags.";
+        if (ramGb >= 6) return "Screen 960x540 first, then 1280x720 if smooth. Box64 PERFORMANCE; use STABILITY if it crashes.";
+        return "Screen 960x540, Box64 preset STABILITY. Close other apps before launching a game.";
+    }
+
+    private static void openBattery(Context context, boolean samsung) {
+        if (samsung && tryComponent(context, SAMSUNG_BATTERY)) return;
+        if (tryAction(context, Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)) return;
+        openAppInfo(context);
+    }
+
+    private static void openComponentOrAppInfo(Context context, String component) {
+        if (tryComponent(context, component)) return;
+        openAppInfo(context);
+    }
+
+    private static void openAppInfo(Context context) {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.parse("package:" + context.getPackageName()));
+        if (!tryIntent(context, intent)) {
+            tryAction(context, Settings.ACTION_SETTINGS);
+        }
+    }
+
+    private static boolean tryComponent(Context context, String flattened) {
+        Intent intent = new Intent();
+        intent.setComponent(android.content.ComponentName.unflattenFromString(flattened));
+        return tryIntent(context, intent);
+    }
+
+    private static boolean tryAction(Context context, String action) {
+        return tryIntent(context, new Intent(action));
+    }
+
+    private static boolean tryIntent(Context context, Intent intent) {
+        try {
+            context.startActivity(intent);
+            return true;
+        } catch (ActivityNotFoundException | SecurityException e) {
+            return false;
+        }
+    }
+
+    private static long totalRamGb(Context context) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
+        if (am == null) return 0;
+        am.getMemoryInfo(info);
+        return Math.round(info.totalMem / (1024.0 * 1024.0 * 1024.0));
+    }
+
+    private static int dp(Context context, int value) {
+        return (int) (value * context.getResources().getDisplayMetrics().density);
+    }
+
+    private static void addText(Context context, LinearLayout column, String text) {
+        TextView tv = new TextView(context);
+        tv.setText(text);
+        tv.setTextSize(15);
+        tv.setPadding(0, dp(context, 4), 0, dp(context, 4));
+        column.addView(tv);
+    }
+
+    private static void addButton(Context context, LinearLayout column, String label, Runnable action) {
+        Button button = new Button(context);
+        button.setText(label);
+        button.setAllCaps(false);
+        button.setOnClickListener(v -> action.run());
+        column.addView(button);
+    }
+}
+""", encoding="utf-8")
+print("[brand] GamelatorDeviceTuning.java added")
+
+replace_once("app/src/main/java/com/winlator/SettingsFragment.java",
+    "preferences = PreferenceManager.getDefaultSharedPreferences(context);",
+    "preferences = PreferenceManager.getDefaultSharedPreferences(context);\n        com.winlator.core.GamelatorDeviceTuning.addEntry(view, context);")
+
 print("[brand] done")
 PY
